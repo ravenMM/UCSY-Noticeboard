@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "392501602716",
+    "firebase_url": "https://noticeboard-49042.firebaseio.com",
+    "project_id": "noticeboard-49042",
+    "storage_bucket": "noticeboard-49042.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392501602716:android:d92e42fb79e45980",
+        "android_client_info": {
+          "package_name": "com.climbdev2016.noticeboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "392501602716-u129c38g4oo5jj2pmaqvmf8kff3geuhh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.climbdev2016.noticeboard",
+            "certificate_hash": "0de6adc91abe99928749e9157d30397ace675e64"
+          }
+        },
+        {
+          "client_id": "392501602716-9ngtopucslqc9qkted31kmedrikmocol.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD37J1KDhoedxoEJj2syxCNDPGR0YTylfk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "392501602716-9ngtopucslqc9qkted31kmedrikmocol.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
