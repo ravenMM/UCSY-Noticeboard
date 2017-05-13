@@ -35,7 +35,7 @@ public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<NoticeboardMo
     private DatabaseReference mLinkRefernece;
 
     public SelectCategoryAdapter(Context context, Query ref) {
-        super(NoticeboardModel.class, R.layout.single_item, StatusViewHolder.class, ref);
+        super(NoticeboardModel.class, R.layout.main_status_item, StatusViewHolder.class, ref);
         this.mContext = context;
     }
 

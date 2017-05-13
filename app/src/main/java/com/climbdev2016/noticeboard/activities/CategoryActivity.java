@@ -1,7 +1,8 @@
 package com.climbdev2016.noticeboard.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -13,25 +14,25 @@ import com.google.firebase.database.Query;
 
 public class CategoryActivity extends AppCompatActivity {
 
-    private Query selectCategoryQuery;
-    private RecyclerView selectCategoryRecycler;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
         String category = getIntent().getStringExtra("category");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(category);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(category);
+        }
 
-        selectCategoryQuery = FirebaseDatabase.getInstance().getReference().child("Post")
-                .orderByChild("category").equalTo(category);
+        Query selectCategoryQuery = FirebaseDatabase.getInstance().getReference()
+                .child(getString(R.string.child_post))
+                .orderByChild(getString(R.string.child_post_category)).equalTo(category);
 
-        selectCategoryRecycler = (RecyclerView) findViewById(R.id.select_category_recycler);
+        RecyclerView selectCategoryRecycler = (RecyclerView) findViewById(R.id.select_category_recycler);
         selectCategoryRecycler.setLayoutManager(new LinearLayoutManager(this));
-        selectCategoryRecycler.setAdapter(new SelectCategoryAdapter(this,selectCategoryQuery));
-
+        selectCategoryRecycler.setAdapter(new SelectCategoryAdapter(this, selectCategoryQuery));
     }
 
     @Override

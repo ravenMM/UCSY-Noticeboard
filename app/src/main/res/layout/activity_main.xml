@@ -20,40 +20,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-     <com.baoyz.widget.PullRefreshLayout
-         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:id="@+id/swiperefreshlayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-         <ScrollView
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
-
-             <LinearLayout
-                 android:orientation="vertical"
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content">
-                 <android.support.v7.widget.RecyclerView
-                     android:id="@+id/category_list"
-                     android:layout_margin="8dp"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"/>
-
-                 <android.support.v7.widget.RecyclerView
-                     android:id="@+id/status_list"
-                     android:layout_width="match_parent"
-                     android:layout_height="match_parent"/>
-
-             </LinearLayout>
-
-         </ScrollView>
-
-
-     </com.baoyz.widget.PullRefreshLayout>
-
-
+    <include
+        layout="@layout/content_main" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

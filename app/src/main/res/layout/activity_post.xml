@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context="com.climbdev2016.noticeboard.activities.PostActivity">
 
-
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,6 +21,7 @@
 
             <com.jaredrummler.materialspinner.MaterialSpinner
                 android:id="@+id/spinner"
+                android:text="Blah"
                 android:textColor="#fff"
                 android:textAppearance="?android:textAppearanceMedium"
                 app:ms_background_color="@color/colorPrimary"
@@ -37,15 +37,14 @@
         android:hint="Write a new post...."
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@null"
         android:gravity="top|left"
-        android:layout_margin="16dp"
+        android:padding="16dp"
         android:inputType="textMultiLine"
         android:overScrollMode="always"
         android:scrollbarStyle="insideInset"
         android:scrollbars="vertical"
-        android:lines="20"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:scrollHorizontally="false" />
 </android.support.design.widget.CoordinatorLayout>

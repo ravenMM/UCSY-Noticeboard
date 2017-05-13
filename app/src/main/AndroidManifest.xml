@@ -41,13 +41,14 @@
         <activity
             android:name=".activities.ProfileActivity"
             android:label="@string/title_activity_profile"
+            android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
         <activity android:name=".activities.RegisterActivity" />
-        <activity android:name=".activities.CategoryActivity"></activity>
+        <activity android:name=".activities.CategoryActivity"/>
     </application>
 
 </manifest>

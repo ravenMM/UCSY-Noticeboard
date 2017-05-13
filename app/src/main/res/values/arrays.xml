@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="post_categories">
+        <item>Tutorials</item>
+        <item>Assignments</item>
+        <item>Events</item>
+        <item>Reports</item>
+        <item>Others</item>
+    </string-array>
+</resources>

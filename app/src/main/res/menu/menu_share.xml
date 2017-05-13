@@ -3,8 +3,8 @@
 
     <item
         android:id="@+id/action_share"
-        android:icon="@drawable/facebook"
+        android:icon="@drawable/fb"
         android:orderInCategory="100"
-        android:title="Share on Facebook" />
+        android:title="@string/action_share_fb" />
 
 </menu>

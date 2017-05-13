@@ -32,7 +32,7 @@ public class ProfileStatusRecyclerAdapter
     private DatabaseReference mDatabaseReference;
 
     public ProfileStatusRecyclerAdapter(Context context, Query ref) {
-        super(NoticeboardModel.class, R.layout.post_item, StatusViewHolder.class, ref);
+        super(NoticeboardModel.class, R.layout.profile_status_item, StatusViewHolder.class, ref);
         this.mContext = context;
     }
 
@@ -63,7 +63,7 @@ public class ProfileStatusRecyclerAdapter
         final String post_key = getRef(position).getKey();
         MenuBuilder menuBuilder = new MenuBuilder(mContext);
         MenuInflater inflater = new MenuInflater(mContext);
-        inflater.inflate(R.menu.menu_post, menuBuilder);
+        inflater.inflate(R.menu.menu_setting, menuBuilder);
         MenuPopupHelper optionsMenu = new MenuPopupHelper(mContext, menuBuilder, view);
         menuBuilder.setCallback(new MenuBuilder.Callback() {
             @Override
@@ -91,18 +91,18 @@ public class ProfileStatusRecyclerAdapter
 
                     case R.id.action_delete:
 
-                        AlertDialog.Builder abdelete =new AlertDialog.Builder(mContext);
-                        abdelete.setTitle("Delete");
-                        abdelete.setMessage("Are Tou Sure to want to delete?");
-                        abdelete.setPositiveButton("Delte", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder deleteDialog =new AlertDialog.Builder(mContext);
+                        deleteDialog.setTitle("Delete");
+                        deleteDialog.setMessage(R.string.post_delete_warning_txt);
+                        deleteDialog.setPositiveButton(R.string.delete_txt, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 mDatabaseReference.child(post_key).removeValue();
                             }
                         });
 
-                        abdelete.setNegativeButton("Cancel",null);
-                        abdelete.show();
+                        deleteDialog.setNegativeButton("Cancel",null);
+                        deleteDialog.show();
 
                     default:
                         return false;

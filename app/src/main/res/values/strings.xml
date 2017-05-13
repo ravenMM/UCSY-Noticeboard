@@ -1,9 +1,43 @@
 <resources>
     <string name="app_name">Noticeboard</string>
-    <string name="action_settings">Settings</string>
     <string name="facebook_app_id">678134492374528</string>
     <string name="facebook_provider_id">facebook.com</string>
     <string name="title_activity_profile">ProfileActivity</string>
+    <string name="login_error_txt">Login error. Please try again.</string>
+    <string name="login_txt">Logging in</string>
+    <string name="registering_txt">Registering your account…</string>
+    <string name="post_delete_warning_txt">Are you sure you want to delete this post?</string>
+    <string name="delete_txt">Delete</string>
+
+    <string name="key_category">category</string>
+
+    <!-- Action Strings -->
+    <string name="action_share_fb">Share on Facebook</string>
+    <string name="action_post">Post</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
     <string name="action_profile">Profile</string>
-    <string-array name="category"></string-array>
+    <string name="action_settings">Settings</string>
+
+    <!-- Firebase Child Strings -->
+    <string name="child_users">Users</string>
+    <string name="child_post">Post</string>
+    <string name="child_link">Link</string>
+
+    <string name="child_link_link">link</string>
+
+    <string name="child_profile_images">Profile_Images</string>
+    <string name="child_cover_images">Cover_Images</string>
+
+    <string name="child_user_name">name</string>
+    <string name="child_user_occupation">occupation</string>
+    <string name="child_user_image">image</string>
+    <string name="child_user_cover">cover</string>
+
+    <string name="child_post_user_id">user_id</string>
+    <string name="child_post_category">category</string>
+    <string name="child_post_content">content</string>
+    <string name="child_post_time">time</string>
+    <string name="child_post_user_name">user_name</string>
+    <string name="child_post_user_profile_picture">user_profile_picture</string>
 </resources>

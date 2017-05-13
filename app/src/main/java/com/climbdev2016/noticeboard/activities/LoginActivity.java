@@ -30,17 +30,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Arrays;
+import es.dmoral.toasty.Toasty;
 
 public class LoginActivity extends AppCompatActivity {
 
     private CallbackManager callbackManager;
-    private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private LoginButton login;
+
+    private FirebaseAuth mAuth;
+    private DatabaseReference mUserRef;
+    private FirebaseUser mUser;
+
     private ProgressDialog mProgressDialog;
-    private CardView mCardView;
-    private DatabaseReference mDatabaseReference;
+    LoginButton fbLoginBtn;
+    CardView cardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +51,18 @@ public class LoginActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users");
-        mDatabaseReference.keepSynced(true);
-        mCardView = (CardView) findViewById(R.id.card_view);
+        mUserRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_users));
+        mUserRef.keepSynced(true);
 
         callbackManager = CallbackManager.Factory.create();
 
         mProgressDialog = new ProgressDialog(this);
 
-        login = (LoginButton) findViewById(R.id.login);
+        cardView = (CardView) findViewById(R.id.card_view);
 
-        login.setReadPermissions(Arrays.asList("email"));
-        login.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        fbLoginBtn = (LoginButton) findViewById(R.id.fb_login_button);
+        fbLoginBtn.setReadPermissions("email");
+        fbLoginBtn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 handleAccessToken(loginResult.getAccessToken());
@@ -76,12 +79,11 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
         mAuth = FirebaseAuth.getInstance();
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser mUser = mAuth.getCurrentUser();
+                mUser = mAuth.getCurrentUser();
                 if (mUser!=null){
                     goToMain();
                 }
@@ -91,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleAccessToken(AccessToken accessToken) {
-        mProgressDialog.setMessage("logging in");
+        mProgressDialog.setMessage(getString(R.string.login_txt));
         mProgressDialog.show();
 
         AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
@@ -99,10 +101,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (!task.isSuccessful()){
-                    Toast.makeText(LoginActivity.this,"Firebase error",Toast.LENGTH_LONG).show();
+                    Toasty.error(LoginActivity.this, getString(R.string.login_error_txt), Toast.LENGTH_LONG).show();
                 }
                 mProgressDialog.dismiss();
-
             }
         });
 
@@ -121,22 +122,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToMain() {
-        final String user_key = mAuth.getCurrentUser().getUid();
+        final String user_key = mUser.getUid();
 
-        mDatabaseReference.addValueEventListener(new ValueEventListener() {
+        mUserRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Intent intent = null;
                 if (dataSnapshot.hasChild(user_key)){
-                    Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+                    intent = new Intent(LoginActivity.this,MainActivity.class);
                 }else {
-                    Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
+                    intent = new Intent(LoginActivity.this,RegisterActivity.class);
                 }
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             }
 
             @Override
@@ -151,7 +150,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode,resultCode,data);
-        login.setVisibility(View.GONE);
-        mCardView.setVisibility(View.GONE);
+        fbLoginBtn.setVisibility(View.GONE);
+        cardView.setVisibility(View.GONE);
     }
 }
