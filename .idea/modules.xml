@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Noticeboard-Test-master.iml" filepath="$PROJECT_DIR$/Noticeboard-Test-master.iml" />
       <module fileurl="file://$PROJECT_DIR$/UCSY-Noticeboard.iml" filepath="$PROJECT_DIR$/UCSY-Noticeboard.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>

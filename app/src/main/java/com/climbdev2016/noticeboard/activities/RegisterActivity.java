@@ -27,7 +27,6 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 import es.dmoral.toasty.Toasty;
 
 import static com.climbdev2016.noticeboard.utils.Constants.CODE_GALLERY_REQUEST;
-import static com.climbdev2016.noticeboard.utils.Constants.DEFAULT_COVER_URL;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -39,17 +38,17 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private Uri mImageUri = null;
     private ProgressDialog mProgressDialog;
 
-    private DatabaseReference mDbUserRef;
+    private DatabaseReference mUserRef;
     private FirebaseUser mUser;
-    private StorageReference mStorage;
+    private StorageReference mProfileRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mDbUserRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_users));
-        mStorage = FirebaseStorage.getInstance().getReference().child(getString(R.string.child_profile_images));
+        mUserRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_users));
+        mProfileRef = FirebaseStorage.getInstance().getReference().child(getString(R.string.child_profile_images));
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         mProgressDialog = new ProgressDialog(this);
@@ -70,11 +69,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 startSetupAccount();
                 break;
             case R.id.register_user_image:
-                Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, CODE_GALLERY_REQUEST);
+                callCameraAction();
                 break;
         }
+    }
+
+    private void callCameraAction() {
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, CODE_GALLERY_REQUEST);
     }
 
     private void startSetupAccount() {
@@ -83,26 +86,34 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         final String occupation = registerUserOccupation.getText().toString().trim();
         final String user_id = mUser.getUid();
 
-        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(occupation) && mImageUri != null ){
-            mProgressDialog.setMessage(getString(R.string.registering_txt));
+        if (TextUtils.isEmpty(name)) {
+            registerUserName.setError("Username can't be blank.");
+        } else if (TextUtils.isEmpty(occupation)) {
+            registerUserOccupation.setError("Occupation can't be blank");
+        } else if (mImageUri == null){
+            Toasty.warning(RegisterActivity.this,"You must set your profile.",Toast.LENGTH_SHORT).show();
+        } else {
+            mProgressDialog.setMessage(getString(R.string.setup_acc_txt));
             mProgressDialog.show();
 
-            StorageReference filepath = mStorage.child(mImageUri.getLastPathSegment());
+            StorageReference filepath = mProfileRef.child(mImageUri.getLastPathSegment());
             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String downloadUri = taskSnapshot.getDownloadUrl().toString();
 
-                    mDbUserRef.child(user_id).child(getString(R.string.child_user_name)).setValue(name);
-                    mDbUserRef.child(user_id).child(getString(R.string.child_user_occupation)).setValue(occupation);
-                    mDbUserRef.child(user_id).child(getString(R.string.child_user_image)).setValue(downloadUri);
+                    String downloadUrl = null;
+                    if (taskSnapshot.getDownloadUrl() != null) {
+                        downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                    }
+
+                    mUserRef.child(user_id).child(getString(R.string.child_user_name)).setValue(name);
+                    mUserRef.child(user_id).child(getString(R.string.child_user_occupation)).setValue(occupation);
+                    mUserRef.child(user_id).child(getString(R.string.child_user_image)).setValue(downloadUrl);
 
                     mProgressDialog.dismiss();
                     goToMain();
                 }
             });
-        }else {
-            Toasty.warning(RegisterActivity.this,"Please fill all the fields.",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -119,22 +130,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == CODE_GALLERY_REQUEST && resultCode == RESULT_OK){
-            Uri imageUri = data.getData();
-
-            CropImage.activity(imageUri).setCropShape(CropImageView.CropShape.OVAL)
+            CropImage.activity(data.getData()).setCropShape(CropImageView.CropShape.OVAL)
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(1,1).start(this);
-
         }
-
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+        else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+                CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 mImageUri = result.getUri();
                 registerUserImage.setImageURI(mImageUri);
-
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
+                mImageUri = null;
+                Toasty.error(this, "Crop failed.", Toast.LENGTH_SHORT).show();
             }
         }
     }

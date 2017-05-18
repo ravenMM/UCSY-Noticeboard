@@ -5,7 +5,7 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="login_error_txt">Login error. Please try again.</string>
     <string name="login_txt">Logging in</string>
-    <string name="registering_txt">Registering your account…</string>
+    <string name="setup_acc_txt">Setting up your account…</string>
     <string name="post_delete_warning_txt">Are you sure you want to delete this post?</string>
     <string name="delete_txt">Delete</string>
 

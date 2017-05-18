@@ -47,7 +47,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
-        <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.RegisterActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".activities.CategoryActivity"/>
     </application>
 

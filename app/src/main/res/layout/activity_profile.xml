@@ -7,7 +7,7 @@
     tools:context=".activities.ProfileActivity">
 
     <com.baoyz.widget.PullRefreshLayout
-        android:id="@+id/profileRefresh"
+        android:id="@+id/profile_refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -49,7 +49,7 @@
                         />
 
                     <TextView
-                        android:id="@+id/name_tv"
+                        android:id="@+id/user_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -61,13 +61,13 @@
                         android:layout_centerHorizontal="true"/>
 
                     <TextView
-                        android:id="@+id/occupation_tv"
+                        android:id="@+id/user_occupation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Occupation"
                         android:textColor="@color/secondary_text"
                         android:textSize="18sp"
-                        android:layout_below="@id/name_tv"
+                        android:layout_below="@id/user_name"
                         android:layout_centerHorizontal="true"/>
 
                     <TextView
@@ -75,7 +75,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="sign out"
-                        android:layout_below="@id/occupation_tv"
+                        android:layout_below="@id/user_occupation"
                         android:layout_centerHorizontal="true"
                         android:textAppearance="?android:textAppearanceMedium" />
 
@@ -96,7 +96,7 @@
                         android:textStyle="bold" />
 
                     <android.support.v7.widget.RecyclerView
-                        android:id="@+id/rc_profile_post"
+                        android:id="@+id/user_status_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 

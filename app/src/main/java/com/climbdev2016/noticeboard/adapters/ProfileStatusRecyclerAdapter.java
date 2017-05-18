@@ -19,31 +19,31 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.ui.ExpandableTextView;
 import com.climbdev2016.noticeboard.R;
-import com.climbdev2016.noticeboard.models.NoticeboardModel;
+import com.climbdev2016.noticeboard.models.Post;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 public class ProfileStatusRecyclerAdapter
-        extends FirebaseRecyclerAdapter<NoticeboardModel, ProfileStatusRecyclerAdapter.StatusViewHolder> {
+        extends FirebaseRecyclerAdapter<Post, ProfileStatusRecyclerAdapter.StatusViewHolder> {
 
     private Context mContext;
     private DatabaseReference mDatabaseReference;
 
     public ProfileStatusRecyclerAdapter(Context context, Query ref) {
-        super(NoticeboardModel.class, R.layout.profile_status_item, StatusViewHolder.class, ref);
+        super(Post.class, R.layout.profile_status_item, StatusViewHolder.class, ref);
         this.mContext = context;
     }
 
     @Override
-    protected void populateViewHolder(StatusViewHolder viewHolder, NoticeboardModel model, final int position) {
+    protected void populateViewHolder(StatusViewHolder viewHolder, Post model, final int position) {
         viewHolder.setUser_name(model.getUser_name());
         viewHolder.setUser_profile_picture(mContext, model.getUser_profile_picture());
         viewHolder.setContent(model.getContent());
 
         long currentTime = System.currentTimeMillis();
-        long postTime = -1 * Long.parseLong(model.getTime());
+        long postTime = Long.parseLong(model.getTime());
         String time = (String) DateUtils.getRelativeTimeSpanString(postTime, currentTime,DateUtils.SECOND_IN_MILLIS);
         viewHolder.setTime(time);
 
@@ -117,11 +117,11 @@ public class ProfileStatusRecyclerAdapter
     }
 
     @Override
-    public NoticeboardModel getItem(int position) {
+    public Post getItem(int position) {
         return super.getItem(getItemCount() - (position+1));
     }
 
-    static class StatusViewHolder extends RecyclerView.ViewHolder{
+    public static class StatusViewHolder extends RecyclerView.ViewHolder{
 
         View mView;
         ImageView postSetting;

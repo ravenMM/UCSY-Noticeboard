@@ -6,7 +6,7 @@
     tools:context="com.climbdev2016.noticeboard.activities.CategoryActivity">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/select_category_recycler"
+        android:id="@+id/status_list_by_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 

@@ -4,14 +4,13 @@ package com.climbdev2016.noticeboard.models;
  * Created by zwe on 4/26/17.
  */
 
-public class NoticeboardModel {
-    private String user_name,user_profile_picture,time,content,category;
+public class Post {
+    private String user_name, user_profile_picture, time, content, category;
 
-   public NoticeboardModel(){
-
+   public Post(){
    }
 
-    public NoticeboardModel(String user_name, String user_profile_picture, String time, String content, String category) {
+    public Post(String user_name, String user_profile_picture, String time, String content, String category) {
         this.user_name = user_name;
         this.user_profile_picture = user_profile_picture;
         this.time = time;

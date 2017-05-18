@@ -7,21 +7,22 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.ProfileStatusRecyclerAdapter;
+import com.climbdev2016.noticeboard.models.User;
 import com.facebook.login.LoginManager;
-import com.flaviofaria.kenburnsview.KenBurnsView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,26 +36,28 @@ import com.mikhaellopez.circularimageview.CircularImageView;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import static com.climbdev2016.noticeboard.utils.Constants.CODE_COVER_GALLERY_REQUEST;
+import es.dmoral.toasty.Toasty;
+
 import static com.climbdev2016.noticeboard.utils.Constants.CODE_PROFILE_GALLERY_REQUEST;
 
 public class ProfileActivity extends AppCompatActivity
         implements PullRefreshLayout.OnRefreshListener, View.OnClickListener{
 
+    private static final String TAG = ProfileActivity.class.getSimpleName();
+
     private FirebaseAuth mAuth;
-    private FirebaseUser mUser;
+    private String userId;
     private DatabaseReference mUserRef;
     private StorageReference mProfileRef;
 
     private Uri profileUri = null;
-    private CircularImageView profile;
+    private CircularImageView userProfile;
     private TextView userName;
     private TextView userOccupation;
-    private TextView signOut;
     private PullRefreshLayout mPullRefreshLayout;
     private ProgressDialog mProgressDialog;
 
-    private ProfileStatusRecyclerAdapter adapter;
+    private ProfileStatusRecyclerAdapter mProfileAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,131 +65,83 @@ public class ProfileActivity extends AppCompatActivity
         setContentView(R.layout.activity_profile);
 
         mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
+        if (mAuth.getCurrentUser() != null) {
+            userId = mAuth.getCurrentUser().getUid();
+        }
         DatabaseReference mDbRef = FirebaseDatabase.getInstance().getReference();
         StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mProfileRef = mStorageRef.child(getString(R.string.child_profile_images));
-
         mUserRef = mDbRef.child(getString(R.string.child_users));
-
         mUserRef.keepSynced(true);
+
         Query currentUserPostQuery = mDbRef.child(getString(R.string.child_post))
-                .orderByChild(getString(R.string.child_post_user_id)).equalTo(mUser.getUid());
+                .orderByChild(getString(R.string.child_post_user_id)).equalTo(userId);
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rc_profile_post);
-        profile = (CircularImageView) findViewById(R.id.user_profile);
-        userName = (TextView) findViewById(R.id.name_tv);
-        signOut = (TextView) findViewById(R.id.sign_out);
-        userOccupation = (TextView) findViewById(R.id.occupation_tv);
-        mPullRefreshLayout = (PullRefreshLayout) findViewById(R.id.profileRefresh);
-
+        userProfile = (CircularImageView) findViewById(R.id.user_profile);
+        userName = (TextView) findViewById(R.id.user_name);
+        userOccupation = (TextView) findViewById(R.id.user_occupation);
+        mPullRefreshLayout = (PullRefreshLayout) findViewById(R.id.profile_refresh);
         mProgressDialog = new ProgressDialog(this);
 
-        setData();
+        setUserData();
+
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.user_status_list);
+        TextView signOut = (TextView) findViewById(R.id.sign_out);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter =new ProfileStatusRecyclerAdapter(this, currentUserPostQuery);
-        mRecyclerView.setAdapter(adapter);
+        mProfileAdapter = new ProfileStatusRecyclerAdapter(this, currentUserPostQuery);
+        mRecyclerView.setAdapter(mProfileAdapter);
 
         mPullRefreshLayout.setOnRefreshListener(this);
-        profile.setOnClickListener(this);
-        signOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mAuth.signOut();
-                LoginManager.getInstance().logOut();
-                Intent intent = new Intent(ProfileActivity.this,LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            }
-        });
+        userProfile.setOnClickListener(this);
+        signOut.setOnClickListener(this);
     }
 
     @Override
-    public void onClick(View v) {
-        int id = v.getId();
+    public void onClick(View view) {
+        int id = view.getId();
         switch (id) {
             case R.id.user_profile:
-                callCameraAction(CODE_PROFILE_GALLERY_REQUEST);
+                callCameraAction();
+                break;
+            case R.id.sign_out:
+                signOut();
                 break;
         }
     }
 
-    private void callCameraAction(int request) {
+    private void signOut() {
+        mAuth.signOut();
+        LoginManager.getInstance().logOut();
+        Intent intent = new Intent(ProfileActivity.this,LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void callCameraAction() {
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent,request);
+        startActivityForResult(galleryIntent, CODE_PROFILE_GALLERY_REQUEST);
     }
 
-    private void setData() {
-
-        String userId = mUser.getUid();
-
-        mUserRef.child(userId).child(getString(R.string.child_user_name)).addValueEventListener(new ValueEventListener() {
+    private void setUserData() {
+        mUserRef.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String user_name = dataSnapshot.getValue().toString();
-                userName.setText(user_name);
+                User user = dataSnapshot.getValue(User.class);
+                userName.setText(user.getName());
+                userOccupation.setText(user.getOccupation());
+                Glide.with(ProfileActivity.this)
+                        .load(user.getImage()).diskCacheStrategy(DiskCacheStrategy.ALL).into(userProfile);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                Log.e(TAG, "Error " + databaseError);
             }
         });
-
-        mUserRef.child(userId).child(getString(R.string.child_user_occupation)).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String occupation = dataSnapshot.getValue().toString();
-                userOccupation.setText(occupation);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        mUserRef.child(userId).child(getString(R.string.child_user_image)).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String imageUrl = dataSnapshot.getValue().toString();
-                Glide.with(ProfileActivity.this).load(imageUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(profile);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
     }
-
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CODE_PROFILE_GALLERY_REQUEST && resultCode == RESULT_OK){
-
-            profileUri = data.getData();
-
-            CropImage.activity(profileUri).setCropShape(CropImageView.CropShape.OVAL)
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .setAspectRatio(1, 1).start(this);
-
-        }
-        else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-
-                if (resultCode == RESULT_OK) {
-                    profileUri= result.getUri();
-                    uploadPhoto(mProfileRef);
-                } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                    Exception error = result.getError();
-                }
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -196,53 +151,63 @@ public class ProfileActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         int id = item.getItemId();
-
         switch (id) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
-
             case R.id.action_logout:
-                mAuth.signOut();
-                LoginManager.getInstance().logOut();
-                Intent intent = new Intent(ProfileActivity.this,LoginActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                signOut();
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-
-
-    private void uploadPhoto(StorageReference mStorage) {
-        mProgressDialog.setMessage("Uploading...");
-        mProgressDialog.show();
-
-        StorageReference filepath;
-        final String userId = mUser.getUid();
-
-        if (mStorage == mProfileRef){
-            filepath = mProfileRef.child(profileUri.getLastPathSegment());
-            filepath.putFile(profileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String downloadUri =taskSnapshot.getDownloadUrl().toString();
-                    mUserRef.child(userId).child(getString(R.string.child_user_image)).setValue(downloadUri);
-                }
-            });
-        }
-        mProgressDialog.dismiss();
+    @Override
+    public void onRefresh() {
+        mProfileAdapter.notifyDataSetChanged();
+        mPullRefreshLayout.setRefreshing(false);
     }
 
     @Override
-    public void onRefresh() {
-        adapter.notifyDataSetChanged();
-        mPullRefreshLayout.setRefreshing(false);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CODE_PROFILE_GALLERY_REQUEST && resultCode == RESULT_OK){
+
+            profileUri = data.getData();
+
+            CropImage.activity(profileUri).setCropShape(CropImageView.CropShape.OVAL)
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1, 1).start(this);
+
+        }
+        else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                profileUri= result.getUri();
+                uploadPhoto();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Toasty.error(this, "Crop failed.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void uploadPhoto() {
+
+        StorageReference filepath = mProfileRef.child(profileUri.getLastPathSegment());
+
+        mProgressDialog.setMessage("Uploading...");
+        mProgressDialog.show();
+
+        filepath.putFile(profileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                String downloadUrl = null;
+                if (taskSnapshot.getDownloadUrl() != null)
+                downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                mUserRef.child(userId).child(getString(R.string.child_user_image)).setValue(downloadUrl);
+            }
+        });
+        mProgressDialog.dismiss();
     }
 }

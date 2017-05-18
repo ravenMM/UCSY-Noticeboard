@@ -20,7 +20,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" >
 
             <com.jaredrummler.materialspinner.MaterialSpinner
-                android:id="@+id/spinner"
+                android:id="@+id/category_spinner"
                 android:text="Blah"
                 android:textColor="#fff"
                 android:textAppearance="?android:textAppearanceMedium"
@@ -33,7 +33,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <EditText
-        android:id="@+id/txt_post"
+        android:id="@+id/status_text"
         android:hint="Write a new post...."
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"

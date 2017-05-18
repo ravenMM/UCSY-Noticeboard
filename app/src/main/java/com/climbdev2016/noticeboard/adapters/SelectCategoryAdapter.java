@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.R;
-import com.climbdev2016.noticeboard.models.NoticeboardModel;
+import com.climbdev2016.noticeboard.models.Post;
 import com.climbdev2016.noticeboard.ui.ExpandableTextView;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
@@ -29,23 +29,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<NoticeboardModel, SelectCategoryAdapter.StatusViewHolder> {
+public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<Post, SelectCategoryAdapter.StatusViewHolder> {
 
     private Context mContext;
     private DatabaseReference mLinkRefernece;
 
     public SelectCategoryAdapter(Context context, Query ref) {
-        super(NoticeboardModel.class, R.layout.main_status_item, StatusViewHolder.class, ref);
+        super(Post.class, R.layout.main_status_item, StatusViewHolder.class, ref);
         this.mContext = context;
     }
 
     @Override
-    protected void populateViewHolder(final StatusViewHolder viewHolder, final NoticeboardModel model, int position) {
+    protected void populateViewHolder(final StatusViewHolder viewHolder, final Post model, int position) {
         viewHolder.setUser_name(model.getUser_name());
         viewHolder.setContent(model.getContent());
         viewHolder.setUser_profile_picture(mContext,model.getUser_profile_picture());
         long currentTime = System.currentTimeMillis();
-        long postTime = -1 * Long.parseLong(model.getTime());
+        long postTime = Long.parseLong(model.getTime());
 
         String time = (String) DateUtils.getRelativeTimeSpanString(postTime, currentTime,DateUtils.SECOND_IN_MILLIS);
         viewHolder.setTime(time);
@@ -62,7 +62,7 @@ public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<NoticeboardMo
 
     }
 
-    private void showPopUpMenu(View view, final NoticeboardModel model) {
+    private void showPopUpMenu(View view, final Post model) {
 
         mLinkRefernece = FirebaseDatabase.getInstance().getReference().child("Link");
         MenuBuilder menuBuilder = new MenuBuilder(mContext);
@@ -117,13 +117,13 @@ public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<NoticeboardMo
     }
 
     @Override
-    public NoticeboardModel getItem(int position) {
+    public Post getItem(int position) {
         return super.getItem(getItemCount() - (position+1));
     }
 
 
 
-    static class StatusViewHolder extends RecyclerView.ViewHolder{
+    public static class StatusViewHolder extends RecyclerView.ViewHolder{
 
         View mView;
         private ImageView mOverFlow;

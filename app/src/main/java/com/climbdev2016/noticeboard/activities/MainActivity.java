@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity
         CategoryAdapter.OnItemClickListener, View.OnClickListener {
 
     private StatusAdapter adapter;
-
     private PullRefreshLayout pullRefreshLayout;
 
     @Override
@@ -34,21 +33,21 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser == null){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
 
-        DatabaseReference mDbRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_post));
-        mDbRef.keepSynced(true);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DatabaseReference mPostRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_post));
+        mPostRef.keepSynced(true);
 
         RecyclerView statusList = (RecyclerView) findViewById(R.id.status_list);
         statusList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new StatusAdapter(this, mDbRef);
+        adapter = new StatusAdapter(this, mPostRef);
         statusList.setAdapter(adapter);
 
         RecyclerView categoryList = (RecyclerView) findViewById(R.id.category_list);

@@ -19,7 +19,7 @@ public class CategoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category);
 
-        String category = getIntent().getStringExtra("category");
+        String category = getIntent().getStringExtra(getString(R.string.key_category));
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -30,7 +30,7 @@ public class CategoryActivity extends AppCompatActivity {
                 .child(getString(R.string.child_post))
                 .orderByChild(getString(R.string.child_post_category)).equalTo(category);
 
-        RecyclerView selectCategoryRecycler = (RecyclerView) findViewById(R.id.select_category_recycler);
+        RecyclerView selectCategoryRecycler = (RecyclerView) findViewById(R.id.status_list_by_category);
         selectCategoryRecycler.setLayoutManager(new LinearLayoutManager(this));
         selectCategoryRecycler.setAdapter(new SelectCategoryAdapter(this, selectCategoryQuery));
     }
