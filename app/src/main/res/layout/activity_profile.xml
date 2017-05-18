@@ -20,66 +20,66 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.constraint.ConstraintLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="300dp">
+                    android:layout_height="240dp">
 
-                    <com.flaviofaria.kenburnsview.KenBurnsView
-                        android:id="@+id/user_cover"
-                        android:layout_width="0dp"
-                        android:layout_height="200dp"
-                        android:layout_marginLeft="0dp"
-                        android:layout_marginRight="0dp"
-                        android:layout_marginTop="0dp"
-                        android:src="@drawable/background"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                    <com.intrusoft.library.FrissonView
+                        xmlns:frisson="http://schemas.android.com/apk/res-auto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        frisson:alphaValue="50"
+                        frisson:tintColor="@color/colorPrimary"
+                        frisson:gradientType="radial"
+                        frisson:gradient_endColor="@color/colorPrimaryDark"
+                        frisson:gradient_startColor="#ffffffff"
+                        frisson:tideCount="3"
+                        frisson:tideHeight="40dp"
+                        android:id="@+id/frissonView" />
 
                     <com.mikhaellopez.circularimageview.CircularImageView
                         android:id="@+id/user_profile"
                         android:layout_width="100dp"
-                        android:layout_height="100dp"
+                        android:layout_height="102dp"
                         android:src="@drawable/ic_account_circle_black_24dp"
                         app:civ_border_color="#80FFFFFF"
                         app:civ_border_width="2dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/user_cover"
-                        app:layout_constraintVertical_bias="0.728" />
+                        android:layout_centerHorizontal="true"
+                        android:layout_margin="16dp"
+                        />
 
                     <TextView
                         android:id="@+id/name_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="0dp"
-                        android:layout_marginRight="0dp"
-                        android:layout_marginTop="0dp"
                         android:ellipsize="end"
                         android:text="Name"
                         android:textColor="@color/primary_text"
                         android:textStyle="bold"
                         android:textSize="24sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/user_profile" />
+                        android:layout_below="@id/user_profile"
+                        android:layout_centerHorizontal="true"/>
 
                     <TextView
                         android:id="@+id/occupation_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="0dp"
-                        android:layout_marginRight="0dp"
-                        android:layout_marginTop="0dp"
                         android:text="Occupation"
                         android:textColor="@color/secondary_text"
                         android:textSize="18sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/name_tv" />
+                        android:layout_below="@id/name_tv"
+                        android:layout_centerHorizontal="true"/>
 
-                </android.support.constraint.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/sign_out"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="sign out"
+                        android:layout_below="@id/occupation_tv"
+                        android:layout_centerHorizontal="true"
+                        android:textAppearance="?android:textAppearanceMedium" />
+
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"

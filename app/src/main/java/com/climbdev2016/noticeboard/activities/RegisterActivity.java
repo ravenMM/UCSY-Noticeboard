@@ -96,7 +96,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     mDbUserRef.child(user_id).child(getString(R.string.child_user_name)).setValue(name);
                     mDbUserRef.child(user_id).child(getString(R.string.child_user_occupation)).setValue(occupation);
                     mDbUserRef.child(user_id).child(getString(R.string.child_user_image)).setValue(downloadUri);
-                    mDbUserRef.child(user_id).child(getString(R.string.child_user_cover)).setValue(DEFAULT_COVER_URL);
 
                     mProgressDialog.dismiss();
                     goToMain();

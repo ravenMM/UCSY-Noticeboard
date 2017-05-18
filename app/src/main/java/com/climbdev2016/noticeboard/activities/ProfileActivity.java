@@ -45,15 +45,12 @@ public class ProfileActivity extends AppCompatActivity
     private FirebaseUser mUser;
     private DatabaseReference mUserRef;
     private StorageReference mProfileRef;
-    private StorageReference mCoverRef;
 
     private Uri profileUri = null;
-    private Uri coverUri = null;
-
-    private KenBurnsView cover;
     private CircularImageView profile;
     private TextView userName;
     private TextView userOccupation;
+    private TextView signOut;
     private PullRefreshLayout mPullRefreshLayout;
     private ProgressDialog mProgressDialog;
 
@@ -70,17 +67,17 @@ public class ProfileActivity extends AppCompatActivity
         StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
 
         mProfileRef = mStorageRef.child(getString(R.string.child_profile_images));
-        mCoverRef = mStorageRef.child(getString(R.string.child_cover_images));
 
         mUserRef = mDbRef.child(getString(R.string.child_users));
+
         mUserRef.keepSynced(true);
         Query currentUserPostQuery = mDbRef.child(getString(R.string.child_post))
                 .orderByChild(getString(R.string.child_post_user_id)).equalTo(mUser.getUid());
 
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.rc_profile_post);
-        cover = (KenBurnsView) findViewById(R.id.user_cover);
         profile = (CircularImageView) findViewById(R.id.user_profile);
         userName = (TextView) findViewById(R.id.name_tv);
+        signOut = (TextView) findViewById(R.id.sign_out);
         userOccupation = (TextView) findViewById(R.id.occupation_tv);
         mPullRefreshLayout = (PullRefreshLayout) findViewById(R.id.profileRefresh);
 
@@ -94,7 +91,17 @@ public class ProfileActivity extends AppCompatActivity
 
         mPullRefreshLayout.setOnRefreshListener(this);
         profile.setOnClickListener(this);
-        cover.setOnClickListener(this);
+        signOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mAuth.signOut();
+                LoginManager.getInstance().logOut();
+                Intent intent = new Intent(ProfileActivity.this,LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     @Override
@@ -103,9 +110,6 @@ public class ProfileActivity extends AppCompatActivity
         switch (id) {
             case R.id.user_profile:
                 callCameraAction(CODE_PROFILE_GALLERY_REQUEST);
-                break;
-            case R.id.user_cover:
-                callCameraAction(CODE_COVER_GALLERY_REQUEST);
                 break;
         }
     }
@@ -156,18 +160,6 @@ public class ProfileActivity extends AppCompatActivity
             }
         });
 
-        mUserRef.child(userId).child("cover").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String coverUrl = dataSnapshot.getValue().toString();
-                Glide.with(ProfileActivity.this).load(coverUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(cover);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
 
@@ -181,11 +173,6 @@ public class ProfileActivity extends AppCompatActivity
             CropImage.activity(profileUri).setCropShape(CropImageView.CropShape.OVAL)
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .setAspectRatio(1, 1).start(this);
-
-        }
-        else if (requestCode == CODE_COVER_GALLERY_REQUEST  && resultCode == RESULT_OK){
-            coverUri = data.getData();
-            uploadPhoto(mCoverRef);
 
         }
         else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -247,16 +234,6 @@ public class ProfileActivity extends AppCompatActivity
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     String downloadUri =taskSnapshot.getDownloadUrl().toString();
                     mUserRef.child(userId).child(getString(R.string.child_user_image)).setValue(downloadUri);
-                }
-            });
-        }
-        if (mStorage== mCoverRef){
-            filepath = mCoverRef.child(profileUri.getLastPathSegment());
-            filepath.putFile(coverUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    String downloadUri =taskSnapshot.getDownloadUrl().toString();
-                    mUserRef.child(userId).child(getString(R.string.child_user_cover)).setValue(downloadUri);
                 }
             });
         }

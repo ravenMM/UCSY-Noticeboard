@@ -64,7 +64,7 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<NoticeboardModel, Sta
 
     }
 
-    private void showPopUpMenu(View view, final NoticeboardModel model) {
+    public void showPopUpMenu(View view, final NoticeboardModel model) {
 
         mLinkRef = FirebaseDatabase.getInstance().getReference().child(mContext.getString(R.string.child_link));
 
