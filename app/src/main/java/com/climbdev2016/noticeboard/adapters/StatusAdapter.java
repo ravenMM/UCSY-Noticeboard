@@ -66,7 +66,7 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
 
     public void showPopUpMenu(View view, final Post model) {
 
-        mLinkRef = FirebaseDatabase.getInstance().getReference().child(mContext.getString(R.string.child_link));
+        mLinkRef = Constants.FIREBASE_DATABASE_REFERENCE.child(mContext.getString(R.string.child_link));
 
         MenuBuilder menuBuilder = new MenuBuilder(mContext);
         MenuInflater inflater = new MenuInflater(mContext);

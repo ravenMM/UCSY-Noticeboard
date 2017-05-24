@@ -18,6 +18,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.models.Post;
 import com.climbdev2016.noticeboard.ui.ExpandableTextView;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
@@ -64,7 +65,7 @@ public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<Post, SelectC
 
     private void showPopUpMenu(View view, final Post model) {
 
-        mLinkRefernece = FirebaseDatabase.getInstance().getReference().child("Link");
+        mLinkRefernece = Constants.FIREBASE_DATABASE_REFERENCE.child("Link");
         MenuBuilder menuBuilder = new MenuBuilder(mContext);
         MenuInflater inflater = new MenuInflater(mContext);
         inflater.inflate(R.menu.menu_share, menuBuilder);

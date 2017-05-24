@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -51,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        mUserRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_users));
+        mUserRef = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_users));
         mUserRef.keepSynced(true);
 
         callbackManager = CallbackManager.Factory.create();

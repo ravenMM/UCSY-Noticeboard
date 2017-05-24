@@ -20,6 +20,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.ui.ExpandableTextView;
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.models.Post;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -59,7 +60,7 @@ public class ProfileStatusRecyclerAdapter
 
     private void showPopupMenu(final View view, final int position) {
 
-        mDatabaseReference = FirebaseDatabase.getInstance().getReference().child("Post");
+        mDatabaseReference = Constants.FIREBASE_DATABASE_REFERENCE.child("Post");
         final String post_key = getRef(position).getKey();
         MenuBuilder menuBuilder = new MenuBuilder(mContext);
         MenuInflater inflater = new MenuInflater(mContext);

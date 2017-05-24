@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -47,7 +48,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mUserRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_users));
+        mUserRef = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_users));
         mProfileRef = FirebaseStorage.getInstance().getReference().child(getString(R.string.child_profile_images));
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 

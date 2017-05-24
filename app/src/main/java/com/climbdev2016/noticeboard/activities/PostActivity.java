@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.models.User;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -52,7 +53,7 @@ public class PostActivity extends AppCompatActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        DatabaseReference mDbRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference mDbRef = Constants.FIREBASE_DATABASE_REFERENCE;
         FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser != null) {
             userId = mUser.getUid();

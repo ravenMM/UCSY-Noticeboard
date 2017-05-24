@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.SelectCategoryAdapter;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
@@ -30,8 +31,7 @@ public class CategoryActivity extends AppCompatActivity implements SwipeRefreshL
             actionBar.setTitle(category);
         }
 
-        Query selectCategoryQuery = FirebaseDatabase.getInstance().getReference()
-                .child(getString(R.string.child_post))
+        Query selectCategoryQuery = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_post))
                 .orderByChild(getString(R.string.child_post_category)).equalTo(category);
 
         categoryRefrsh = (SwipeRefreshLayout) findViewById(R.id.category_refresh);
