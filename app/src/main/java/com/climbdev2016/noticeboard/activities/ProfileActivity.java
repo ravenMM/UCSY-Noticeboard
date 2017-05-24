@@ -20,6 +20,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.ProfileStatusRecyclerAdapter;
 import com.climbdev2016.noticeboard.models.User;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,14 +49,12 @@ public class ProfileActivity extends AppCompatActivity
     private FirebaseAuth mAuth;
     private String userId;
     private DatabaseReference mUserRef;
-    private StorageReference mProfileRef;
-
-    private Uri profileUri = null;
     private CircularImageView userProfile;
     private TextView userName;
     private TextView userOccupation;
     private PullRefreshLayout mPullRefreshLayout;
-    private ProgressDialog mProgressDialog;
+    private Query currentUserPostQuery;
+    private RecyclerView mRecyclerView;
 
     private ProfileStatusRecyclerAdapter mProfileAdapter;
 
@@ -68,25 +67,21 @@ public class ProfileActivity extends AppCompatActivity
         if (mAuth.getCurrentUser() != null) {
             userId = mAuth.getCurrentUser().getUid();
         }
-        DatabaseReference mDbRef = FirebaseDatabase.getInstance().getReference();
-        StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
-
-        mProfileRef = mStorageRef.child(getString(R.string.child_profile_images));
+        DatabaseReference mDbRef = Constants.FIREBASE_DATABASE_REFERENCE;
         mUserRef = mDbRef.child(getString(R.string.child_users));
         mUserRef.keepSynced(true);
 
-        Query currentUserPostQuery = mDbRef.child(getString(R.string.child_post))
+        currentUserPostQuery = mDbRef.child(getString(R.string.child_post))
                 .orderByChild(getString(R.string.child_post_user_id)).equalTo(userId);
 
         userProfile = (CircularImageView) findViewById(R.id.user_profile);
         userName = (TextView) findViewById(R.id.user_name);
         userOccupation = (TextView) findViewById(R.id.user_occupation);
         mPullRefreshLayout = (PullRefreshLayout) findViewById(R.id.profile_refresh);
-        mProgressDialog = new ProgressDialog(this);
 
         setUserData();
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.user_status_list);
+        mRecyclerView = (RecyclerView) findViewById(R.id.user_status_list);
         TextView signOut = (TextView) findViewById(R.id.sign_out);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -94,7 +89,6 @@ public class ProfileActivity extends AppCompatActivity
         mRecyclerView.setAdapter(mProfileAdapter);
 
         mPullRefreshLayout.setOnRefreshListener(this);
-        userProfile.setOnClickListener(this);
         signOut.setOnClickListener(this);
     }
 
@@ -102,9 +96,6 @@ public class ProfileActivity extends AppCompatActivity
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
-            case R.id.user_profile:
-                callCameraAction();
-                break;
             case R.id.sign_out:
                 signOut();
                 break;
@@ -120,11 +111,6 @@ public class ProfileActivity extends AppCompatActivity
         finish();
     }
 
-    private void callCameraAction() {
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, CODE_PROFILE_GALLERY_REQUEST);
-    }
 
     private void setUserData() {
         mUserRef.child(userId).addValueEventListener(new ValueEventListener() {
@@ -170,44 +156,4 @@ public class ProfileActivity extends AppCompatActivity
         mPullRefreshLayout.setRefreshing(false);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CODE_PROFILE_GALLERY_REQUEST && resultCode == RESULT_OK){
-
-            profileUri = data.getData();
-
-            CropImage.activity(profileUri).setCropShape(CropImageView.CropShape.OVAL)
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1, 1).start(this);
-
-        }
-        else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                profileUri= result.getUri();
-                uploadPhoto();
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Toasty.error(this, "Crop failed.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void uploadPhoto() {
-
-        StorageReference filepath = mProfileRef.child(profileUri.getLastPathSegment());
-
-        mProgressDialog.setMessage("Uploading...");
-        mProgressDialog.show();
-
-        filepath.putFile(profileUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                String downloadUrl = null;
-                if (taskSnapshot.getDownloadUrl() != null)
-                downloadUrl = taskSnapshot.getDownloadUrl().toString();
-                mUserRef.child(userId).child(getString(R.string.child_user_image)).setValue(downloadUrl);
-            }
-        });
-        mProgressDialog.dismiss();
-    }
 }

@@ -15,6 +15,7 @@ import com.baoyz.widget.PullRefreshLayout;
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.CategoryAdapter;
 import com.climbdev2016.noticeboard.adapters.StatusAdapter;
+import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity
 
     private StatusAdapter adapter;
     private PullRefreshLayout pullRefreshLayout;
+    private DatabaseReference mPostRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +44,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DatabaseReference mPostRef = FirebaseDatabase.getInstance().getReference().child(getString(R.string.child_post));
+        mPostRef = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_post));
         mPostRef.keepSynced(true);
-
-        RecyclerView statusList = (RecyclerView) findViewById(R.id.status_list);
-        statusList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new StatusAdapter(this, mPostRef);
-        statusList.setAdapter(adapter);
 
         RecyclerView categoryList = (RecyclerView) findViewById(R.id.category_list);
         categoryList.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
@@ -97,5 +94,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         startActivity(new Intent(MainActivity.this, PostActivity.class));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        RecyclerView statusList = (RecyclerView) findViewById(R.id.status_list);
+        statusList.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new StatusAdapter(this, mPostRef);
+        statusList.setAdapter(adapter);
     }
 }
