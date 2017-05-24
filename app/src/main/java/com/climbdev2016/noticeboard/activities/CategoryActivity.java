@@ -1,6 +1,7 @@
 package com.climbdev2016.noticeboard.activities;
 
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,7 +13,10 @@ import com.climbdev2016.noticeboard.adapters.SelectCategoryAdapter;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-public class CategoryActivity extends AppCompatActivity {
+public class CategoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+
+    private SwipeRefreshLayout categoryRefrsh;
+    private SelectCategoryAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +34,13 @@ public class CategoryActivity extends AppCompatActivity {
                 .child(getString(R.string.child_post))
                 .orderByChild(getString(R.string.child_post_category)).equalTo(category);
 
+        categoryRefrsh = (SwipeRefreshLayout) findViewById(R.id.category_refresh);
+        categoryRefrsh.setOnRefreshListener(this);
+
         RecyclerView selectCategoryRecycler = (RecyclerView) findViewById(R.id.status_list_by_category);
         selectCategoryRecycler.setLayoutManager(new LinearLayoutManager(this));
-        selectCategoryRecycler.setAdapter(new SelectCategoryAdapter(this, selectCategoryQuery));
+        mAdapter = new SelectCategoryAdapter(this, selectCategoryQuery);
+        selectCategoryRecycler.setAdapter(mAdapter);
     }
 
     @Override
@@ -42,5 +50,11 @@ public class CategoryActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRefresh() {
+        mAdapter.notifyDataSetChanged();
+        categoryRefrsh.setRefreshing(false);
     }
 }

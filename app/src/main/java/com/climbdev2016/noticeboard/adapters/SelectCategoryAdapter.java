@@ -128,13 +128,17 @@ public class SelectCategoryAdapter extends FirebaseRecyclerAdapter<Post, SelectC
         View mView;
         private ImageView mOverFlow;
         private TextView postIn;
+        private View line;
+
         public StatusViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
             mOverFlow = (ImageView) mView.findViewById(R.id.mainOverFlow);
             postIn = (TextView) mView.findViewById(R.id.postIn);
-            postIn.setVisibility(View.GONE);
+            line = mView.findViewById(R.id.line_view);
 
+            postIn.setVisibility(View.GONE);
+            line.setVisibility(View.GONE);
         }
 
         private void setUser_name(String user_name){
