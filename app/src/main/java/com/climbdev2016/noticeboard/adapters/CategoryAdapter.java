@@ -1,5 +1,6 @@
 package com.climbdev2016.noticeboard.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +19,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     private  String[] categories;
 
-    public CategoryAdapter(String[] categories){
-        this.categories = categories;
+    public CategoryAdapter(Context context) {
+        categories = context.getResources().getStringArray(R.array.post_categories);
     }
 
     @Override

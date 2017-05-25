@@ -18,7 +18,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -27,7 +26,9 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import es.dmoral.toasty.Toasty;
 
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
 import static com.climbdev2016.noticeboard.utils.Constants.CODE_GALLERY_REQUEST;
+import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -48,7 +49,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mUserRef = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_users));
+        mUserRef = FIREBASE_DB_REF.child(CHILD_USER);
         mProfileRef = FirebaseStorage.getInstance().getReference().child(getString(R.string.child_profile_images));
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 

@@ -28,10 +28,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import es.dmoral.toasty.Toasty;
+
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
+import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -52,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
 
-        mUserRef = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_users));
+        mUserRef = FIREBASE_DB_REF.child(CHILD_USER);
         mUserRef.keepSynced(true);
 
         callbackManager = CallbackManager.Factory.create();

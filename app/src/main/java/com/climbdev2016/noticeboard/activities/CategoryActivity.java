@@ -1,7 +1,6 @@
 package com.climbdev2016.noticeboard.activities;
 
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,15 +8,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
 import com.climbdev2016.noticeboard.R;
-import com.climbdev2016.noticeboard.adapters.SelectCategoryAdapter;
+import com.climbdev2016.noticeboard.adapters.StatusAdapter;
 import com.climbdev2016.noticeboard.utils.Constants;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-public class CategoryActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+import static com.climbdev2016.noticeboard.utils.Constants.CATEGORY_VIEW;
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
 
-    private SwipeRefreshLayout categoryRefrsh;
-    private SelectCategoryAdapter mAdapter;
+public class CategoryActivity extends AppCompatActivity {
+
+    private StatusAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,16 +31,19 @@ public class CategoryActivity extends AppCompatActivity implements SwipeRefreshL
             actionBar.setTitle(category);
         }
 
-        Query selectCategoryQuery = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_post))
+        Query selectCategoryQuery = Constants.FIREBASE_DB_REF.child(CHILD_POST)
                 .orderByChild(getString(R.string.child_post_category)).equalTo(category);
-
-        categoryRefrsh = (SwipeRefreshLayout) findViewById(R.id.category_refresh);
-        categoryRefrsh.setOnRefreshListener(this);
 
         RecyclerView selectCategoryRecycler = (RecyclerView) findViewById(R.id.status_list_by_category);
         selectCategoryRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new SelectCategoryAdapter(this, selectCategoryQuery);
+        mAdapter = new StatusAdapter(this, selectCategoryQuery, CATEGORY_VIEW);
         selectCategoryRecycler.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -50,11 +53,5 @@ public class CategoryActivity extends AppCompatActivity implements SwipeRefreshL
             finish();
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onRefresh() {
-        mAdapter.notifyDataSetChanged();
-        categoryRefrsh.setRefreshing(false);
     }
 }

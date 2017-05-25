@@ -21,9 +21,6 @@
     <string name="action_settings">Settings</string>
 
     <!-- Firebase Child Strings -->
-    <string name="child_users">Users</string>
-    <string name="child_post">Post</string>
-    <string name="child_link">Link</string>
 
     <string name="child_link_link">link</string>
 
@@ -35,7 +32,7 @@
     <string name="child_user_image">image</string>
     <string name="child_user_cover">cover</string>
 
-    <string name="child_post_user_id">user_id</string>
+    <string name="child_post_owner_id">owner_id</string>
     <string name="child_post_category">category</string>
     <string name="child_post_content">content</string>
     <string name="child_post_time">time</string>

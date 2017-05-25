@@ -13,30 +13,33 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
-import com.climbdev2016.noticeboard.models.User;
+import com.climbdev2016.noticeboard.models.Post;
 import com.climbdev2016.noticeboard.utils.Constants;
+import com.climbdev2016.noticeboard.utils.Utils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import es.dmoral.toasty.Toasty;
+
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
+import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
 
 
 public class PostActivity extends AppCompatActivity
         implements MaterialSpinner.OnItemSelectedListener, View.OnTouchListener {
 
     private DatabaseReference mPostRef;
-    private DatabaseReference mUserRef;
+    private FirebaseUser mUser;
+
     private String userId;
+    private String userName;
+    private String userProfileUrl;
+    private String postCategory = "Tutorials";
 
     private EditText txtPost;
     private MaterialSpinner spinner;
-    private String postCategory = "Tutorials";
 
 
     @Override
@@ -44,7 +47,7 @@ public class PostActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.ptoolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -53,14 +56,14 @@ public class PostActivity extends AppCompatActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        DatabaseReference mDbRef = Constants.FIREBASE_DATABASE_REFERENCE;
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser != null) {
             userId = mUser.getUid();
+            userName = mUser.getDisplayName();
+            userProfileUrl = mUser.getPhotoUrl().toString();
         }
 
-        mPostRef = mDbRef.child(getString(R.string.child_post));
-        mUserRef = mDbRef.child(getString(R.string.child_users));
+        mPostRef = FIREBASE_DB_REF.child(CHILD_POST);
 
         spinner = (MaterialSpinner) findViewById(R.id.category_spinner);
         spinner.setItems(getResources().getStringArray(R.array.post_categories));
@@ -79,44 +82,33 @@ public class PostActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        else if (id == R.id.action_post) {
-
-            String postContent = txtPost.getText().toString().trim();
-            String postTime = String.valueOf(System.currentTimeMillis());
-
-            if (TextUtils.isEmpty(postContent)) {
-                Toasty.warning(this, "Write something to post...", Toast.LENGTH_SHORT, true).show();
-            } else {
-
-                final DatabaseReference newPostRef = mPostRef.push();
-
-                mUserRef.child(userId).addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-                        newPostRef.child(getString(R.string.child_post_user_name)).setValue(user.getName());
-                        newPostRef.child(getString(R.string.child_post_user_profile_picture)).setValue(user.getImage());
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        //Log.e(TAG, "Error " + databaseError);
-                    }
-                });
-                newPostRef.child(getString(R.string.child_post_user_id)).setValue(userId);
-                newPostRef.child(getString(R.string.child_post_time)).setValue(postTime);
-                newPostRef.child(getString(R.string.child_post_content)).setValue(postContent);
-                newPostRef.child(getString(R.string.child_post_category)).setValue(postCategory);
-                Toasty.success(PostActivity.this, "Posted", Toast.LENGTH_SHORT, true).show();
-                finish();
+        switch (id) {
+            case android.R.id.home:
+                onBackPressed();
                 return true;
-            }
+            case R.id.action_post:
+                post();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+    }
+
+    private void post() {
+        String postContent = txtPost.getText().toString().trim();
+        if (!Utils.isOnline(this)) {
+            Toasty.error(this, "You are offline!", Toast.LENGTH_SHORT, true).show();
+        } else if (TextUtils.isEmpty(postContent)) {
+            Toasty.warning(this, "Write something first!", Toast.LENGTH_SHORT, true).show();
+        } else {
+            Post newPost = new Post(
+                    userId, userName, userProfileUrl,
+                    String.valueOf(System.currentTimeMillis()), postContent, postCategory
+            );
+            mPostRef.push().setValue(newPost);
+            Toasty.success(this, "Posted", Toast.LENGTH_SHORT, true).show();
+            finish();
+        }
     }
 
     @Override

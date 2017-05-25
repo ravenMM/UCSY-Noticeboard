@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/ptoolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -21,7 +21,6 @@
 
             <com.jaredrummler.materialspinner.MaterialSpinner
                 android:id="@+id/category_spinner"
-                android:text="Blah"
                 android:textColor="#fff"
                 android:textAppearance="?android:textAppearanceMedium"
                 app:ms_background_color="@color/colorPrimary"
@@ -37,7 +36,7 @@
         android:hint="Write a new post...."
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="@null"
         android:gravity="top|left"
         android:padding="16dp"

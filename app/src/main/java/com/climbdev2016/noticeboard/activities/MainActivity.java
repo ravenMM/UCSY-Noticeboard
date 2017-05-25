@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.baoyz.widget.PullRefreshLayout;
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.CategoryAdapter;
 import com.climbdev2016.noticeboard.adapters.StatusAdapter;
@@ -19,16 +18,19 @@ import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
+import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
+import static com.climbdev2016.noticeboard.utils.Constants.MAIN_VIEW;
 
 
 public class MainActivity extends AppCompatActivity
-        implements PullRefreshLayout.OnRefreshListener,
-        CategoryAdapter.OnItemClickListener, View.OnClickListener {
+        implements CategoryAdapter.OnItemClickListener, View.OnClickListener {
 
     private StatusAdapter adapter;
-    private PullRefreshLayout pullRefreshLayout;
     private DatabaseReference mPostRef;
+
+    RecyclerView statusList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,27 +41,30 @@ public class MainActivity extends AppCompatActivity
         if (mUser == null){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
+            return;
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mPostRef = Constants.FIREBASE_DATABASE_REFERENCE.child(getString(R.string.child_post));
+        mPostRef = FIREBASE_DB_REF.child(CHILD_POST);
         mPostRef.keepSynced(true);
 
+        // category recycler view
         RecyclerView categoryList = (RecyclerView) findViewById(R.id.category_list);
         categoryList.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-
-        CategoryAdapter categoryAdapter =
-                new CategoryAdapter(getResources().getStringArray(R.array.post_categories));
+        CategoryAdapter categoryAdapter = new CategoryAdapter(this);
         categoryAdapter.setOnItemCLickListener(this);
         categoryList.setAdapter(categoryAdapter);
 
+        // status recycler view
+        statusList = (RecyclerView) findViewById(R.id.status_list);
+        statusList.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new StatusAdapter(this, mPostRef, MAIN_VIEW);
+        statusList.setAdapter(adapter);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
-
-        pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pull_refresh_main);
-        pullRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
@@ -79,12 +84,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRefresh() {
-        adapter.notifyDataSetChanged();
-        pullRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
     public void onItemClick(String category) {
         Intent intent = new Intent(MainActivity.this,CategoryActivity.class);
         intent.putExtra(getString(R.string.key_category), category);
@@ -99,9 +98,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        RecyclerView statusList = (RecyclerView) findViewById(R.id.status_list);
-        statusList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new StatusAdapter(this, mPostRef);
-        statusList.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 }

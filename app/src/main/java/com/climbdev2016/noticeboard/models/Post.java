@@ -5,17 +5,32 @@ package com.climbdev2016.noticeboard.models;
  */
 
 public class Post {
-    private String user_name, user_profile_picture, time, content, category;
+
+    private String owner_id;
+    private String user_name;
+    private String user_profile_picture;
+    private String time;
+    private String content;
+    private String category;
 
    public Post(){
    }
 
-    public Post(String user_name, String user_profile_picture, String time, String content, String category) {
+    public Post(String owner_id, String user_name, String user_profile_picture, String time, String content, String category) {
+        this.owner_id = owner_id;
         this.user_name = user_name;
         this.user_profile_picture = user_profile_picture;
         this.time = time;
         this.content = content;
         this.category = category;
+    }
+
+    public String getOwner_id() {
+        return owner_id;
+    }
+
+    public void setOwner_id(String owner_id) {
+        this.owner_id = owner_id;
     }
 
     public String getUser_name() {
