@@ -10,11 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.CategoryAdapter;
 import com.climbdev2016.noticeboard.adapters.StatusAdapter;
-import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -27,10 +27,13 @@ import static com.climbdev2016.noticeboard.utils.Constants.MAIN_VIEW;
 public class MainActivity extends AppCompatActivity
         implements CategoryAdapter.OnItemClickListener, View.OnClickListener {
 
-    private StatusAdapter adapter;
+    private StatusAdapter statusAdapter;
     private DatabaseReference mPostRef;
 
-    RecyclerView statusList;
+    private RecyclerView statusList;
+    private LinearLayoutManager layoutManager;
+
+    private TextView emptyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +62,25 @@ public class MainActivity extends AppCompatActivity
 
         // status recycler view
         statusList = (RecyclerView) findViewById(R.id.status_list);
-        statusList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new StatusAdapter(this, mPostRef, MAIN_VIEW);
-        statusList.setAdapter(adapter);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        statusList.setLayoutManager(layoutManager);
+        statusAdapter = new StatusAdapter(this, mPostRef, MAIN_VIEW);
+
+        statusAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int postCount = statusAdapter.getItemCount();
+                int lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition();
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (postCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    statusList.scrollToPosition(positionStart);
+                }
+            }
+        });
+        statusList.setAdapter(statusAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
@@ -93,11 +112,5 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         startActivity(new Intent(MainActivity.this, PostActivity.class));
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        adapter.notifyDataSetChanged();
     }
 }

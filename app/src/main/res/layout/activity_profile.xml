@@ -1,100 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.support.v4.widget.NestedScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activities.ProfileActivity">
 
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <com.intrusoft.library.FrissonView
+                xmlns:frisson="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                frisson:alphaValue="60"
+                frisson:tintColor="@color/colorPrimary"
+                frisson:gradientType="radial"
+                frisson:gradient_endColor="@color/colorPrimaryDark"
+                frisson:gradient_startColor="@color/primaryLight"
+                frisson:tideCount="4"
+                frisson:tideHeight="40dp"
+                android:id="@+id/frissonView" />
+
+            <com.mikhaellopez.circularimageview.CircularImageView
+                android:id="@+id/user_profile"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginTop="16dp"
+                android:src="@mipmap/ic_launcher"
+                android:layout_centerHorizontal="true" />
+
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:text="Name"
+                android:textColor="@color/primaryText"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:layout_below="@id/user_profile"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:id="@+id/user_occupation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Occupation"
+                android:textColor="@color/secondaryText"
+                android:textSize="18sp"
+                android:layout_below="@id/user_name"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:id="@+id/sign_out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="sign out"
+                android:layout_below="@id/user_occupation"
+                android:layout_centerHorizontal="true"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+        </RelativeLayout>
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="200dp">
-
-                <com.intrusoft.library.FrissonView
-                    xmlns:frisson="http://schemas.android.com/apk/res-auto"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    frisson:alphaValue="60"
-                    frisson:tintColor="@color/colorPrimary"
-                    frisson:gradientType="radial"
-                    frisson:gradient_endColor="@color/colorPrimaryDark"
-                    frisson:gradient_startColor="@color/primaryLight"
-                    frisson:tideCount="4"
-                    frisson:tideHeight="40dp"
-                    android:id="@+id/frissonView" />
-
-                <com.mikhaellopez.circularimageview.CircularImageView
-                    android:id="@+id/user_profile"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginTop="16dp"
-                    android:src="@mipmap/ic_launcher"
-                    android:layout_centerHorizontal="true" />
-
-                <TextView
-                    android:id="@+id/user_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:text="Name"
-                    android:textColor="@color/primaryText"
-                    android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:layout_below="@id/user_profile"
-                    android:layout_centerHorizontal="true"/>
-
-                <TextView
-                    android:id="@+id/user_occupation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Occupation"
-                    android:textColor="@color/secondaryText"
-                    android:textSize="18sp"
-                    android:layout_below="@id/user_name"
-                    android:layout_centerHorizontal="true"/>
-
-                <TextView
-                    android:id="@+id/sign_out"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="sign out"
-                    android:layout_below="@id/user_occupation"
-                    android:layout_centerHorizontal="true"
-                    android:textAppearance="?android:textAppearanceMedium" />
-
-            </RelativeLayout>
-
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_margin="16dp"
+                android:text="Posts"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:text="Posts"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/colorAccent"
-                    android:textStyle="bold" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/user_status_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/user_status_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 
 
-</RelativeLayout>
+</android.support.v4.widget.NestedScrollView>

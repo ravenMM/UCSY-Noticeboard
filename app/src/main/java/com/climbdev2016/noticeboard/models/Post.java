@@ -6,6 +6,7 @@ package com.climbdev2016.noticeboard.models;
 
 public class Post {
 
+    private String post_id;
     private String owner_id;
     private String user_name;
     private String user_profile_picture;
@@ -23,6 +24,14 @@ public class Post {
         this.time = time;
         this.content = content;
         this.category = category;
+    }
+
+    public String getPost_id() {
+        return post_id;
+    }
+
+    public void setPost_id(String post_id) {
+        this.post_id = post_id;
     }
 
     public String getOwner_id() {

@@ -16,7 +16,12 @@ public class Constants {
 
     public static final DatabaseReference FIREBASE_DB_REF =
             FirebaseDatabase.getInstance().getReference();
+
     public static final String CHILD_POST = "Post";
     public static final String CHILD_USER = "Users";
     public static final String CHILD_LINK = "Link";
+
+    public static final String SUB_CHILD_LINK = "link";
+    public static final String SUB_CHILD_CATEGORY = "category";
+    public static final String SUB_CHILD_OWNER_ID = "owner_id";
 }

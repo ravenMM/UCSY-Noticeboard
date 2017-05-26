@@ -11,7 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.climbdev2016.noticeboard.R;
@@ -30,6 +29,7 @@ import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
 import static com.climbdev2016.noticeboard.utils.Constants.PROFILE_VIEW;
+import static com.climbdev2016.noticeboard.utils.Constants.SUB_CHILD_OWNER_ID;
 
 public class ProfileActivity extends AppCompatActivity
         implements View.OnClickListener{
@@ -45,7 +45,7 @@ public class ProfileActivity extends AppCompatActivity
     private Query currentUserPostQuery;
     private RecyclerView mRecyclerView;
 
-    private StatusAdapter mProfileAdapter;
+    private StatusAdapter statusAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class ProfileActivity extends AppCompatActivity
         mUserRef.keepSynced(true);
 
         currentUserPostQuery = FIREBASE_DB_REF.child(CHILD_POST)
-                .orderByChild(getString(R.string.child_post_owner_id)).equalTo(userId);
+                .orderByChild(SUB_CHILD_OWNER_ID).equalTo(userId);
 
         userProfile = (CircularImageView) findViewById(R.id.user_profile);
         userName = (TextView) findViewById(R.id.user_name);
@@ -72,17 +72,14 @@ public class ProfileActivity extends AppCompatActivity
         mRecyclerView = (RecyclerView) findViewById(R.id.user_status_list);
         TextView signOut = (TextView) findViewById(R.id.sign_out);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mProfileAdapter = new StatusAdapter(this, currentUserPostQuery, PROFILE_VIEW);
-        mRecyclerView.setAdapter(mProfileAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        mRecyclerView.setLayoutManager(layoutManager);
+        statusAdapter = new StatusAdapter(this, currentUserPostQuery, PROFILE_VIEW);
+        mRecyclerView.setAdapter(statusAdapter);
 
         signOut.setOnClickListener(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mProfileAdapter.notifyDataSetChanged();
     }
 
     @Override

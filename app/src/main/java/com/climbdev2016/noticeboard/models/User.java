@@ -10,6 +10,15 @@ public class User {
     private String name;
     private String occupation;
 
+    public User() {
+    }
+
+    public User(String image, String name, String occupation) {
+        this.image = image;
+        this.name = name;
+        this.occupation = occupation;
+    }
+
     public String getImage() {
         return image;
     }

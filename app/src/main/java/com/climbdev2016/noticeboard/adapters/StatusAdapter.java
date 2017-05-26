@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.text.format.DateUtils;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -42,6 +44,7 @@ import static com.climbdev2016.noticeboard.utils.Constants.CHILD_LINK;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
 import static com.climbdev2016.noticeboard.utils.Constants.PROFILE_VIEW;
+import static com.climbdev2016.noticeboard.utils.Constants.SUB_CHILD_LINK;
 
 public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.StatusViewHolder> {
 
@@ -63,8 +66,13 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
 
         viewHolder.mUserName.setText(model.getUser_name());
         viewHolder.mContent.setText(model.getContent());
-        Glide.with(mContext).load(model.getUser_profile_picture())
-                .diskCacheStrategy(DiskCacheStrategy.ALL).into(viewHolder.mUserProfile);
+        if (model.getUser_profile_picture() == null) {
+            viewHolder.mUserProfile.setImageDrawable(ContextCompat.getDrawable(mContext,
+                    R.drawable.ic_account_circle_black_24dp));
+        } else {
+            Glide.with(mContext).load(model.getUser_profile_picture())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL).into(viewHolder.mUserProfile);
+        }
         viewHolder.mTime.setText(time);
 
         if (viewCode == CATEGORY_VIEW) {
@@ -77,14 +85,22 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
         viewHolder.mOverFlow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int pos = getItemCount() - (position+1);
-                showPopUpMenu(view, model, pos);
+                showPopUpMenu(view, model);
             }
         });
     }
 
-    public void showPopUpMenu(View view, final Post model, final int pos) {
-        final String key = getRef(pos).getKey();
+    @Override
+    protected Post parseSnapshot(DataSnapshot snapshot) {
+        Post post = super.parseSnapshot(snapshot);
+        if (post != null) {
+            post.setPost_id(snapshot.getKey());
+        }
+        return post;
+    }
+
+    public void showPopUpMenu(View view, final Post model) {
+        final String key = model.getPost_id();
         final DatabaseReference postRef = FIREBASE_DB_REF.child(CHILD_POST);
         MenuBuilder menuBuilder = new MenuBuilder(mContext);
         MenuInflater inflater = new MenuInflater(mContext);
@@ -109,7 +125,7 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
                             final ShareDialog shareDialog = new ShareDialog((Activity) mContext);
                             if (ShareDialog.canShow(ShareLinkContent.class)) {
                                 DatabaseReference mLinkRef = FIREBASE_DB_REF.child(CHILD_LINK);
-                                mLinkRef.child(mContext.getString(R.string.child_link_link)).addValueEventListener(new ValueEventListener() {
+                                mLinkRef.child(SUB_CHILD_LINK).addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         String appLink = (String) dataSnapshot.getValue();
@@ -177,11 +193,6 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
         };
         menuBuilder.setCallback(callback);
         optionsMenu.show();
-    }
-
-    @Override
-    public Post getItem(int position) {
-        return super.getItem(getItemCount() - (position+1));
     }
 
     public static class StatusViewHolder extends RecyclerView.ViewHolder{

@@ -14,10 +14,13 @@ import com.google.firebase.database.Query;
 
 import static com.climbdev2016.noticeboard.utils.Constants.CATEGORY_VIEW;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
+import static com.climbdev2016.noticeboard.utils.Constants.SUB_CHILD_CATEGORY;
 
 public class CategoryActivity extends AppCompatActivity {
 
-    private StatusAdapter mAdapter;
+    private StatusAdapter statusAdapter;
+    private RecyclerView statusList;
+    private LinearLayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,18 +35,28 @@ public class CategoryActivity extends AppCompatActivity {
         }
 
         Query selectCategoryQuery = Constants.FIREBASE_DB_REF.child(CHILD_POST)
-                .orderByChild(getString(R.string.child_post_category)).equalTo(category);
+                .orderByChild(SUB_CHILD_CATEGORY).equalTo(category);
 
-        RecyclerView selectCategoryRecycler = (RecyclerView) findViewById(R.id.status_list_by_category);
-        selectCategoryRecycler.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new StatusAdapter(this, selectCategoryQuery, CATEGORY_VIEW);
-        selectCategoryRecycler.setAdapter(mAdapter);
-    }
+        statusList = (RecyclerView) findViewById(R.id.status_list_by_category);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        statusList.setLayoutManager(layoutManager);
+        statusAdapter = new StatusAdapter(this, selectCategoryQuery, CATEGORY_VIEW);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAdapter.notifyDataSetChanged();
+        statusAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                int postCount = statusAdapter.getItemCount();
+                int lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition();
+                if (lastVisiblePosition == -1 ||
+                        (positionStart >= (postCount - 1) && lastVisiblePosition == (positionStart - 1))) {
+                    statusList.scrollToPosition(positionStart);
+                }
+            }
+        });
+        statusList.setAdapter(statusAdapter);
     }
 
     @Override

@@ -5,6 +5,7 @@
     android:orientation="vertical"
     app:cardElevation="2dp"
     app:cardCornerRadius="7dp"
+    app:cardBackgroundColor="@color/colorPrimary"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:layout_marginTop="16dp"
@@ -17,7 +18,8 @@
         tools:text="Assignments"
         android:textAppearance="?android:textAppearanceSmall"
         android:padding="8dp"
-        android:textColor="@color/colorPrimary"
+        android:textStyle="bold|italic"
+        android:textColor="#fff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

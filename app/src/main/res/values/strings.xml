@@ -20,22 +20,8 @@
     <string name="action_profile">Profile</string>
     <string name="action_settings">Settings</string>
 
-    <!-- Firebase Child Strings -->
-
-    <string name="child_link_link">link</string>
+    <!-- Firebase Strings -->
 
     <string name="child_profile_images">Profile_Images</string>
     <string name="child_cover_images">Cover_Images</string>
-
-    <string name="child_user_name">name</string>
-    <string name="child_user_occupation">occupation</string>
-    <string name="child_user_image">image</string>
-    <string name="child_user_cover">cover</string>
-
-    <string name="child_post_owner_id">owner_id</string>
-    <string name="child_post_category">category</string>
-    <string name="child_post_content">content</string>
-    <string name="child_post_time">time</string>
-    <string name="child_post_user_name">user_name</string>
-    <string name="child_post_user_profile_picture">user_profile_picture</string>
 </resources>

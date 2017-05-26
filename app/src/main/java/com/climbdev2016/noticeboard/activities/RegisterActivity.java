@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
+import com.climbdev2016.noticeboard.models.User;
 import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +38,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private EditText registerUserName;
     private EditText registerUserOccupation;
 
+    private String userId;
+
     private Uri mImageUri = null;
     private ProgressDialog mProgressDialog;
 
@@ -52,6 +55,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         mUserRef = FIREBASE_DB_REF.child(CHILD_USER);
         mProfileRef = FirebaseStorage.getInstance().getReference().child(getString(R.string.child_profile_images));
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (mUser != null) {
+            userId = mUser.getUid();
+        }
 
         mProgressDialog = new ProgressDialog(this);
 
@@ -86,7 +92,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         final String name = registerUserName.getText().toString().trim();
         final String occupation = registerUserOccupation.getText().toString().trim();
-        final String user_id = mUser.getUid();
 
         if (TextUtils.isEmpty(name)) {
             registerUserName.setError("Username can't be blank.");
@@ -108,9 +113,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                         downloadUrl = taskSnapshot.getDownloadUrl().toString();
                     }
 
-                    mUserRef.child(user_id).child(getString(R.string.child_user_name)).setValue(name);
-                    mUserRef.child(user_id).child(getString(R.string.child_user_occupation)).setValue(occupation);
-                    mUserRef.child(user_id).child(getString(R.string.child_user_image)).setValue(downloadUrl);
+                    User user = new User(downloadUrl, name, occupation);
+                    mUserRef.child(userId).setValue(user);
 
                     mProgressDialog.dismiss();
                     goToMain();
