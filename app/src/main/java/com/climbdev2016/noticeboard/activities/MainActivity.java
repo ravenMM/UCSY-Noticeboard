@@ -13,10 +13,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.CategoryAdapter;
 import com.climbdev2016.noticeboard.adapters.StatusAdapter;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -27,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_ADMIN;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
@@ -39,10 +42,13 @@ public class MainActivity extends AppCompatActivity
     private StatusAdapter statusAdapter;
     private DatabaseReference mPostRef;
     private DatabaseReference mUserRef;
+    private DatabaseReference mAdminRef;
     private RecyclerView statusList;
     private LinearLayoutManager layoutManager;
     private AdView mAdView;
     private FloatingActionButton fab;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,9 @@ public class MainActivity extends AppCompatActivity
         
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
 
         mPostRef = FIREBASE_DB_REF.child(CHILD_POST);
         mPostRef.keepSynced(true);
@@ -61,6 +70,12 @@ public class MainActivity extends AppCompatActivity
         mAdView = (AdView)findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        try{
+            findViewById(R.id.action_admin).setVisibility(View.INVISIBLE);
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
         // category recycler view
         RecyclerView categoryList = (RecyclerView) findViewById(R.id.category_list);
@@ -107,6 +122,8 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.action_profile){
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
             return true;
+        }else if (id==R.id.action_logout){
+            signOut();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -134,7 +151,8 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
 
         mUserRef = FIREBASE_DB_REF.child(CHILD_USER);
-        FirebaseUser mUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUserRef.keepSynced(true);
+
         if (mUser == null){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
@@ -149,11 +167,13 @@ public class MainActivity extends AppCompatActivity
                         try{
                             fab.setVisibility(View.GONE);
                             findViewById(R.id.action_profile).setVisibility(View.GONE);
+                            findViewById(R.id.action_admin).setVisibility(View.GONE);
                         }catch (NullPointerException e){
                             e.printStackTrace();
                         }
 
                     }else {
+                        checkAdmin();
                         mAdView.setVisibility(View.GONE);
                     }
                 }
@@ -163,11 +183,53 @@ public class MainActivity extends AppCompatActivity
 
                 }
             });
+
+
         }
+    }
+
+    private void checkAdmin() {
+        mAdminRef = FIREBASE_DB_REF.child(CHILD_ADMIN);
+        mAdminRef.keepSynced(true);
+
+        final String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        mAdminRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChild(user)){
+                    try{
+                        findViewById(R.id.action_admin).setVisibility(View.GONE);
+                    }catch (NullPointerException e){
+                        e.printStackTrace();
+                    }
+                }else {
+                    findViewById(R.id.action_admin).setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
     }
+
+
+    private void signOut() {
+        mAuth.signOut();
+        LoginManager.getInstance().logOut();
+        Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+
 }

@@ -14,5 +14,13 @@
         android:id="@+id/action_setting"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:title="Setting" />
+        android:title="About" />
+
+    <item android:id="@+id/action_admin"
+        app:showAsAction="ifRoom"
+        android:title="Admin" />
+
+    <item android:id="@+id/action_logout"
+        app:showAsAction="ifRoom"
+        android:title="Logout"/>
 </menu>

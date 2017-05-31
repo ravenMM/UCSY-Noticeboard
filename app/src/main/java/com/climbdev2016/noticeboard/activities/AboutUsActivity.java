@@ -22,18 +22,6 @@ public class AboutUsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about_us);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        AboutView view = AboutBuilder.with(this)
-                .setAppIcon(R.mipmap.ic_launcher)
-                .setAppName(R.string.app_name)
-                .addGooglePlayStoreLink("8002078663318221363")
-                .addFiveStarsAction()
-                .setVersionNameAsAppSubTitle()
-                .addShareAction(R.string.app_name)
-                .setLinksAnimated(true)
-                .setShowAsCard(true)
-                .build();
-
-        addContentView(view, layoutParams);
     }
 
     @Override
