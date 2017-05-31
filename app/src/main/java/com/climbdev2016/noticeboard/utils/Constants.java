@@ -21,6 +21,7 @@ public class Constants {
     public static final String CHILD_USER = "Users";
     public static final String CHILD_LINK = "Link";
     public static final String CHILD_CODE = "Code";
+    public static final String CHILD_ADMIN = "Admin";
 
     public static final String SUB_CHILD_LINK = "link";
     public static final String SUB_CHILD_CATEGORY = "category";
