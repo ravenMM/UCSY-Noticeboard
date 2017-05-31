@@ -60,12 +60,38 @@
 
                     <TextView
                         android:textStyle="bold"
+                        android:textColor="#000"
                         android:layout_margin="8dp"
                         android:textAppearance="?android:textAppearanceSmall"
                         android:text="Noticeboard for UCSY Students"
                         android:layout_gravity="center"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:text="Are You a student or teacher?"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <RadioGroup
+                        android:id="@+id/rdoGroup"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+                        <RadioButton
+                            android:id="@+id/rdoStudent"
+                            android:text="Student"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                        <RadioButton
+                            android:id="@+id/rdoTeacher"
+                            android:text="Teacher"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </RadioGroup>
 
                     <com.facebook.login.widget.LoginButton
                         android:id="@+id/fb_login_button"

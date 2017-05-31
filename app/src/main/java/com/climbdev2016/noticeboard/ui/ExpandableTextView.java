@@ -15,7 +15,7 @@ import com.climbdev2016.noticeboard.R;
 
 public class ExpandableTextView extends android.support.v7.widget.AppCompatTextView {
 
-    private static final int DEFAULT_TRIM_LENGTH = 100;
+    private static final int DEFAULT_TRIM_LENGTH = 300;
     private static final String ELLIPSIS = ".... Continue Reading...";
     private CharSequence originalText;
     private CharSequence trimmedText;

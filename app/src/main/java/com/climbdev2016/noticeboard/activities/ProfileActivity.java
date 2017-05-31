@@ -38,13 +38,13 @@ public class ProfileActivity extends AppCompatActivity
 
     private FirebaseAuth mAuth;
     private String userId;
+    private DatabaseReference mPostRef;
     private DatabaseReference mUserRef;
     private CircularImageView userProfile;
     private TextView userName;
     private TextView userOccupation;
     private Query currentUserPostQuery;
     private RecyclerView mRecyclerView;
-
     private StatusAdapter statusAdapter;
 
     @Override
@@ -57,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity
             userId = mAuth.getCurrentUser().getUid();
         }
 
+        mPostRef = FIREBASE_DB_REF.child(CHILD_POST);
         mUserRef = FIREBASE_DB_REF.child(CHILD_USER);
         mUserRef.keepSynced(true);
 
@@ -79,7 +80,30 @@ public class ProfileActivity extends AppCompatActivity
         statusAdapter = new StatusAdapter(this, currentUserPostQuery, PROFILE_VIEW);
         mRecyclerView.setAdapter(statusAdapter);
 
+        emptyViewSetup();
+
         signOut.setOnClickListener(this);
+    }
+
+    private void emptyViewSetup() {
+
+        currentUserPostQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChildren()){
+                    findViewById(R.id.empty_view).setVisibility(View.GONE);
+                }else {
+                    findViewById(R.id.empty_view).setVisibility(View.VISIBLE);
+                    findViewById(R.id.original_view).setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        findViewById(R.id.empty_view_post).setOnClickListener(this);
     }
 
     @Override
@@ -89,7 +113,15 @@ public class ProfileActivity extends AppCompatActivity
             case R.id.sign_out:
                 signOut();
                 break;
+            case R.id.empty_view_post :
+                post();
+                break;
         }
+    }
+
+    private void post() {
+        startActivity(new Intent(ProfileActivity.this, PostActivity.class));
+        finish();
     }
 
     private void signOut() {

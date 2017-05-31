@@ -12,7 +12,7 @@
     <string name="key_category">category</string>
 
     <!-- Action Strings -->
-    
+
     <string name="action_share_fb">Share on Facebook</string>
     <string name="action_post">Post</string>
     <string name="action_edit">Edit</string>
@@ -21,7 +21,10 @@
     <string name="action_settings">Settings</string>
 
     <!-- Firebase Strings -->
-
     <string name="child_profile_images">Profile_Images</string>
     <string name="child_cover_images">Cover_Images</string>
+
+    <!-- Firebase Admob -->
+    <string name="ad_app_id">ca-app-pub-8392212001629941~9968851113</string>
+    <string name="ad_unit_id">ca-app-pub-8392212001629941/2445584317</string>
 </resources>

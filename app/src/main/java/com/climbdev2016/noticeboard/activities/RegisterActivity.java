@@ -18,7 +18,10 @@ import com.climbdev2016.noticeboard.utils.Constants;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -27,6 +30,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import es.dmoral.toasty.Toasty;
 
+import static com.climbdev2016.noticeboard.utils.Constants.CHILD_CODE;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
 import static com.climbdev2016.noticeboard.utils.Constants.CODE_GALLERY_REQUEST;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
@@ -37,7 +41,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private ImageView registerUserImage;
     private EditText registerUserName;
     private EditText registerUserOccupation;
-
+    private EditText registerInviteCode;
+    private DatabaseReference mCodeRef;
     private String userId;
 
     private Uri mImageUri = null;
@@ -53,6 +58,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_register);
 
         mUserRef = FIREBASE_DB_REF.child(CHILD_USER);
+        mCodeRef = FIREBASE_DB_REF.child(CHILD_CODE);
         mProfileRef = FirebaseStorage.getInstance().getReference().child(getString(R.string.child_profile_images));
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser != null) {
@@ -64,6 +70,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         registerUserImage = (ImageView) findViewById(R.id.register_user_image);
         registerUserName = (EditText) findViewById(R.id.register_user_name);
         registerUserOccupation = (EditText) findViewById(R.id.register_user_occupation);
+        registerInviteCode = (EditText) findViewById(R.id.register_invite_code);
         Button btnRegisterUser = (Button) findViewById(R.id.btnRegisterUser);
 
         registerUserImage.setOnClickListener(this);
@@ -92,6 +99,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         final String name = registerUserName.getText().toString().trim();
         final String occupation = registerUserOccupation.getText().toString().trim();
+        final String inviteCode = registerInviteCode.getText().toString().trim();
 
         if (TextUtils.isEmpty(name)) {
             registerUserName.setError("Username can't be blank.");
@@ -99,25 +107,43 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             registerUserOccupation.setError("Occupation can't be blank");
         } else if (mImageUri == null){
             Toasty.warning(RegisterActivity.this,"You must set your profile.",Toast.LENGTH_SHORT).show();
-        } else {
+        } else if (inviteCode == null){
+            Toasty.warning(RegisterActivity.this,"Need Invite Code",Toast.LENGTH_SHORT).show();
+        }
+        else {
             mProgressDialog.setMessage(getString(R.string.setup_acc_txt));
             mProgressDialog.show();
 
-            StorageReference filepath = mProfileRef.child(mImageUri.getLastPathSegment());
-            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            mCodeRef.addValueEventListener(new ValueEventListener() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChild(inviteCode)){
+                        StorageReference filepath = mProfileRef.child(mImageUri.getLastPathSegment());
+                        filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                    String downloadUrl = null;
-                    if (taskSnapshot.getDownloadUrl() != null) {
-                        downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                                String downloadUrl = null;
+                                if (taskSnapshot.getDownloadUrl() != null) {
+                                    downloadUrl = taskSnapshot.getDownloadUrl().toString();
+                                }
+
+                                User user = new User(downloadUrl, name, occupation);
+                                mUserRef.child(userId).setValue(user);
+
+                                mProgressDialog.dismiss();
+                                goToMain();
+                            }
+                        });
+                    }else {
+                        Toasty.error(RegisterActivity.this, "Invite Code is worng!", Toast.LENGTH_SHORT, true).show();
+                        mProgressDialog.dismiss();
                     }
+                }
 
-                    User user = new User(downloadUrl, name, occupation);
-                    mUserRef.child(userId).setValue(user);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-                    mProgressDialog.dismiss();
-                    goToMain();
                 }
             });
         }

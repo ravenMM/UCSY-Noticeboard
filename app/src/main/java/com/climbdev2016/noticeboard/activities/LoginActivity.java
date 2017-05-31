@@ -1,12 +1,15 @@
 package com.climbdev2016.noticeboard.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.View;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.climbdev2016.noticeboard.R;
@@ -39,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private CallbackManager callbackManager;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-
+    private RadioGroup rdoGroup;
     private FirebaseAuth mAuth;
     private DatabaseReference mUserRef;
     private FirebaseUser mUser;
@@ -62,6 +65,9 @@ public class LoginActivity extends AppCompatActivity {
         mProgressDialog = new ProgressDialog(this);
 
         cardView = (CardView) findViewById(R.id.card_view);
+
+        rdoGroup = (RadioGroup) findViewById(R.id.rdoGroup);
+
 
         fbLoginBtn = (LoginButton) findViewById(R.id.fb_login_button);
         fbLoginBtn.setReadPermissions("email");
@@ -88,7 +94,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 mUser = mAuth.getCurrentUser();
                 if (mUser != null){
-                    goToMain();
+                    if (rdoGroup.getCheckedRadioButtonId()==R.id.rdoStudent){
+                        String hide = "hide";
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("Hide",hide);
+                        startActivity(intent);
+                        finish();
+                    }else {
+                        goToMain();
+                    }
                 }
             }
         };

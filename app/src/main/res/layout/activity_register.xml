@@ -4,13 +4,8 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.climbdev2016.noticeboard.activities.RegisterActivity">
-
-    <com.flaviofaria.kenburnsview.KenBurnsView
-        android:id="@+id/backgroundImage"
-        android:src="@drawable/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
@@ -78,7 +73,20 @@
 
                         <EditText
                             android:id="@+id/register_user_occupation"
-                            android:hint="Department / Roll No."
+                            android:hint="Department"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="16dp"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/register_invite_code"
+                            android:hint="Invite Code"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="16dp"/>
