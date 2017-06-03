@@ -27,6 +27,7 @@ import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import es.dmoral.toasty.Toasty;
 
+import static com.climbdev2016.noticeboard.utils.Constants.APPROVE_NO;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
@@ -42,7 +43,7 @@ public class PostActivity extends AppCompatActivity
     private String userName;
     private String userProfileUrl;
     private String postCategory = "Tutorials";
-
+    private String postApprove;
     private EditText txtPost;
     private MaterialSpinner spinner;
 
@@ -114,9 +115,10 @@ public class PostActivity extends AppCompatActivity
                     User user = dataSnapshot.getValue(User.class);
                     userName = user.getName();
                     userProfileUrl = user.getImage();
+                    postApprove = APPROVE_NO;
                     Post newPost = new Post(
                             userId, userName, userProfileUrl,
-                            String.valueOf(System.currentTimeMillis()), postContent, postCategory
+                            String.valueOf(System.currentTimeMillis()), postContent, postCategory,postApprove
                     );
                     mPostRef.push().setValue(newPost);
                     Toasty.success(PostActivity.this, "Posted", Toast.LENGTH_SHORT, true).show();

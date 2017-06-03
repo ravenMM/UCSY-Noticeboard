@@ -1,6 +1,5 @@
 package com.climbdev2016.noticeboard.activities;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -12,9 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.climbdev2016.noticeboard.R;
 import com.climbdev2016.noticeboard.adapters.CategoryAdapter;
 import com.climbdev2016.noticeboard.adapters.StatusAdapter;
@@ -27,13 +23,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.climbdev2016.noticeboard.utils.Constants.APPROVE_YES;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_ADMIN;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_USER;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
 import static com.climbdev2016.noticeboard.utils.Constants.MAIN_VIEW;
+import static com.climbdev2016.noticeboard.utils.Constants.SUB_CHILD_POST_APPROVE;
 
 
 public class MainActivity extends AppCompatActivity
@@ -49,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton fab;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
+    private Query currentApprove;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +61,10 @@ public class MainActivity extends AppCompatActivity
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
 
-        mPostRef = FIREBASE_DB_REF.child(CHILD_POST);
-        mPostRef.keepSynced(true);
 
+        currentApprove =FIREBASE_DB_REF.child(CHILD_POST)
+                .orderByChild(SUB_CHILD_POST_APPROVE).equalTo(APPROVE_YES);
+        currentApprove.keepSynced(true);
         //Admob
         MobileAds.initialize(this, getString(R.string.ad_app_id));
 
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         layoutManager.setStackFromEnd(true);
         layoutManager.setReverseLayout(true);
         statusList.setLayoutManager(layoutManager);
-        statusAdapter = new StatusAdapter(this, mPostRef, MAIN_VIEW);
+        statusAdapter = new StatusAdapter(this, currentApprove, MAIN_VIEW);
 
         statusAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -124,6 +125,12 @@ public class MainActivity extends AppCompatActivity
             return true;
         }else if (id==R.id.action_logout){
             signOut();
+        }else if (id==R.id.action_admin){
+            startActivity(new Intent(MainActivity.this, AdminActivity.class));
+            return true;
+        }else if (id==R.id.action_about){
+            startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

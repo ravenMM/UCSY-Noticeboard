@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.text.format.DateUtils;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,10 +39,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import es.dmoral.toasty.Toasty;
 
+import static com.climbdev2016.noticeboard.utils.Constants.APPROVE_YES;
 import static com.climbdev2016.noticeboard.utils.Constants.CATEGORY_VIEW;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_LINK;
 import static com.climbdev2016.noticeboard.utils.Constants.CHILD_POST;
+import static com.climbdev2016.noticeboard.utils.Constants.DELETE_POST_VIEW;
 import static com.climbdev2016.noticeboard.utils.Constants.FIREBASE_DB_REF;
+import static com.climbdev2016.noticeboard.utils.Constants.PENDING_VIEW;
 import static com.climbdev2016.noticeboard.utils.Constants.PROFILE_VIEW;
 import static com.climbdev2016.noticeboard.utils.Constants.SUB_CHILD_LINK;
 
@@ -49,6 +53,7 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
 
     private Context mContext;
     private int viewCode;
+    private DatabaseReference mPostRef;
 
     public StatusAdapter(Context context, Query ref, int viewCode) {
         super(Post.class, R.layout.status_item, StatusViewHolder.class, ref);
@@ -76,9 +81,23 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
 
         if (viewCode == CATEGORY_VIEW) {
             viewHolder.hideCategory();
-        } else {
+            viewHolder.hidePending();
+        }else if (viewCode == PENDING_VIEW){
+            viewHolder.showPending();
             viewHolder.showCategory();
             viewHolder.mCategory.setText(model.getCategory());
+        }
+        else if (viewCode == DELETE_POST_VIEW){
+            viewHolder.showDelete();
+            viewHolder.showCategory();
+            viewHolder.mCategory.setText(model.getCategory());
+
+        }
+        else {
+            viewHolder.showCategory();
+            viewHolder.hidePending();
+            viewHolder.mCategory.setText(model.getCategory());
+
         }
 
         viewHolder.mOverFlow.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +106,51 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
                 showPopUpMenu(view, model);
             }
         });
+
+        viewHolder.mPendingApprove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pending(view,model);
+            }
+        });
+        viewHolder.mPendingDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pending(view,model);
+            }
+        });
+
+
+    }
+
+    private void pending(View view, Post model) {
+        mPostRef = FIREBASE_DB_REF.child(CHILD_POST);
+        mPostRef.keepSynced(true);
+
+        final String key = model.getPost_id();
+
+        int id = view.getId();
+        switch (id){
+            case R.id.pending_approve :
+                mPostRef.child(key).child("postApprove").setValue(APPROVE_YES);
+                Toasty.success(mContext,"Post Approved!",Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.pending_delete :
+                AlertDialog.Builder deleteDialog =new AlertDialog.Builder(mContext);
+                deleteDialog.setTitle("Delete");
+                deleteDialog.setMessage(R.string.post_delete_warning_txt);
+                deleteDialog.setPositiveButton(R.string.delete_txt, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mPostRef.child(key).removeValue();
+                    }
+                });
+
+                deleteDialog.setNegativeButton("Cancel",null);
+                deleteDialog.show();
+                break;
+        }
     }
 
     @Override
@@ -194,6 +258,7 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
         optionsMenu.show();
     }
 
+
     public static class StatusViewHolder extends RecyclerView.ViewHolder{
 
         private View line;
@@ -204,6 +269,8 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
         private ImageView mUserProfile;
         private ImageView mOverFlow;
         private ExpandableTextView mContent;
+        private ImageView mPendingApprove;
+        private ImageView mPendingDelete;
 
         public StatusViewHolder(View itemView) {
             super(itemView);
@@ -215,6 +282,9 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
             mOverFlow = (ImageView) itemView.findViewById(R.id.mainOverFlow);
             mContent = (ExpandableTextView) itemView.findViewById(R.id.content);
             line = itemView.findViewById(R.id.line_view);
+            mPendingApprove = (ImageView) itemView.findViewById(R.id.pending_approve);
+            mPendingDelete = (ImageView) itemView.findViewById(R.id.pending_delete);
+
         }
 
         private void showCategory() {
@@ -228,5 +298,20 @@ public class StatusAdapter extends FirebaseRecyclerAdapter<Post, StatusAdapter.S
             line.setVisibility(View.GONE);
             mCategory.setVisibility(View.GONE);
         }
+
+        private void hidePending(){
+            mPendingApprove.setVisibility(View.GONE);
+            mPendingDelete.setVisibility(View.GONE);
+        }
+
+        private void showPending(){
+            mOverFlow.setVisibility(View.GONE);
+        }
+
+        private void showDelete(){
+            mPendingApprove.setVisibility(View.GONE);
+            mOverFlow.setVisibility(View.GONE);
+        }
+
     }
 }

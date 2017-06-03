@@ -7,4 +7,29 @@
         <item>Announcements</item>
         <item>Others</item>
     </string-array>
+
+
+    <string-array name="team_name">
+        <item>Zwe Mun Htun</item>
+        <item>Lin Htet Paing</item>
+        <item>Kaung Si Thu</item>
+        <item>Myo Lwin Oo</item>
+        <item>Con Roy</item>
+    </string-array>
+
+    <string-array name="team_education">
+        <item>Third Year CS Student</item>
+        <item>Third Year CS Student</item>
+        <item>Third Year CS Student</item>
+        <item>First Year CST Student</item>
+        <item>Second Year CT Student</item>
+    </string-array>
+
+    <string-array name="team_type">
+        <item>Coder</item>
+        <item>Coder</item>
+        <item>UI/UX</item>
+        <item>Coder</item>
+        <item>UI/UX</item>
+    </string-array>
 </resources>
