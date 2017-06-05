@@ -51,10 +51,7 @@
             android:name=".activities.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.CategoryActivity" />
-<<<<<<< HEAD
-=======
         <activity android:name=".activities.AboutUsActivity" android:theme="@style/AppTheme.NoActionBar"/>
->>>>>>> 0b7dbfdbf15d03afbe66467f81a5ddb26a1e5225
         <activity android:name=".activities.AdminActivity"></activity>
     </application>
 
