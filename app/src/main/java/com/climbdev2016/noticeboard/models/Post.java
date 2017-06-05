@@ -13,17 +13,20 @@ public class Post {
     private String time;
     private String content;
     private String category;
+    private String postApprove;
 
    public Post(){
    }
 
-    public Post(String owner_id, String user_name, String user_profile_picture, String time, String content, String category) {
+    public Post(String owner_id, String user_name, String user_profile_picture, String time, String content, String category, String postApprove) {
         this.owner_id = owner_id;
         this.user_name = user_name;
         this.user_profile_picture = user_profile_picture;
         this.time = time;
         this.content = content;
         this.category = category;
+        this.postApprove = postApprove;
+
     }
 
     public String getPost_id() {
@@ -80,5 +83,13 @@ public class Post {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getPostApprove() {
+        return postApprove;
+    }
+
+    public void setPostApprove(String postApprove) {
+        this.postApprove = postApprove;
     }
 }

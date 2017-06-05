@@ -6,13 +6,13 @@ package com.climbdev2016.noticeboard.models;
 
 public class User {
 
+    private String userId;
     private String image;
     private String name;
     private String occupation;
 
     public User() {
     }
-
     public User(String image, String name, String occupation) {
         this.image = image;
         this.name = name;
@@ -41,5 +41,13 @@ public class User {
 
     public void setOccupation(String occupation) {
         this.occupation = occupation;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }
